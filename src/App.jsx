@@ -149,3 +149,98 @@ function useCounter(target, duration = 1500) {
 
   return { value, ref }
 }
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+
+const navLinks = [
+  { label: 'What We Do', href: '#what-we-do' },
+  { label: 'SEO vs GEO', href: '#seo-vs-geo' },
+  { label: 'Services', href: '#services' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'FAQ', href: '#faq' },
+]
+
+function Nav() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'backdrop-blur-sm border-b shadow-xl shadow-black/30'
+          : 'bg-transparent'
+      }`}
+      style={scrolled ? { backgroundColor: 'rgba(20,20,20,0.95)', borderColor: DARK_BORDER } : {}}
+    >
+      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <a href="#" className="flex items-center">
+          <img src="/searchlight-logo.png" alt="SearchLight Digital" className="h-16 w-auto" />
+        </a>
+
+        <div className="hidden md:flex items-center gap-7">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-slate-400 hover:text-white text-sm font-medium transition-colors duration-200"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        <div className="hidden md:block">
+          <a
+            href={`mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request`}
+            className="px-4 py-2 rounded-md text-white text-sm font-medium transition-colors duration-200"
+            style={{ backgroundColor: ORANGE }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}
+          >
+            Get Free SEO Analysis
+          </a>
+        </div>
+
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-slate-400 hover:text-white transition-colors"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {menuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {menuOpen && (
+        <div className="md:hidden border-t px-6 py-5 flex flex-col gap-4"
+          style={{ backgroundColor: DARK_BG, borderColor: DARK_BORDER }}
+        >
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className="text-slate-400 hover:text-white text-sm font-medium transition-colors py-1"
+            >
+              {link.label}
+            </a>
+          ))}
+          <a
+            href={`mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request`}
+            onClick={() => setMenuOpen(false)}
+            className="mt-2 px-4 py-3 rounded-md text-white text-sm font-medium text-center"
+            style={{ backgroundColor: ORANGE }}
+          >
+            Get Free SEO Analysis
+          </a>
+        </div>
+      )}
+    </nav>
+  )
+}
