@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GEO Performance Report — <!-- COMPANY_NAME --></title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #020617;
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(58,143,212,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 28px 40px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .brand-pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #3a8fd4;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .brand-label { color: #3a8fd4; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+  .header h1 { color: #fff; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .header .subtitle { color: #64748b; font-size: 13px; margin-top: 3px; }
+  .header-right { text-align: right; }
+  .header-right .domain { color: #3a8fd4; font-size: 14px; font-weight: 700; }
+  .header-right .report-date { color: #475569; font-size: 12px; margin-top: 3px; }
+
+  .pdf-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 8px 16px;
+    background: #3a8fd4; color: #fff;
+    font-size: 12px; font-weight: 700;
+    border: none; border-radius: 6px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .pdf-btn:hover { background: #4fa8f0; }
+
+  .accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #1e5fa0 0%, #3a8fd4 40%, #4fa8f0 70%, #3a8fd4 100%);
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 36px 20px; position: relative; z-index: 1; }
+  section { margin-bottom: 36px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #3a8fd4; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #1e293b; }
+
+  /* ── CARDS ── */
+  .card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 22px;
+  }
+
+  /* ── KPI ROW ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .kpi-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 26px 22px; text-align: center;
+  }
+  .kpi-number {
+    font-size: 52px; font-weight: 800; line-height: 1;
+    color: #fff; letter-spacing: -2px;
+  }
+  .kpi-grade { color: #3a8fd4; font-size: 28px; font-weight: 800; margin-left: 6px; }
+  .kpi-badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; margin-top: 8px;
+  }
+  .badge-aplus { background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.4); }
+  .badge-a    { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-aminus { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+  .badge-bplus { background: rgba(58,143,212,0.2); color: #60a5fa; border: 1px solid rgba(58,143,212,0.35); }
+  .badge-b    { background: rgba(58,143,212,0.15); color: #3a8fd4; border: 1px solid rgba(58,143,212,0.3); }
+  .badge-bminus { background: rgba(58,143,212,0.12); color: #7ab8e8; border: 1px solid rgba(58,143,212,0.25); }
+  .badge-cplus { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .badge-c    { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+  .badge-cminus { background: rgba(245,158,11,0.1); color: #d97706; border: 1px solid rgba(245,158,11,0.2); }
+  .badge-d    { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+  .badge-f    { background: rgba(239,68,68,0.18); color: #ef4444; border: 1px solid rgba(239,68,68,0.35); }
+  .kpi-label { font-size: 11px; color: #475569; margin-top: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-sub { font-size: 20px; font-weight: 700; color: #fff; margin-top: 8px; }
+
+  .summary-bar {
+    margin-top: 14px; padding: 14px 20px;
+    background: #0f172a; border: 1px solid #1e293b;
+    border-left: 4px solid #3a8fd4;
+    border-radius: 8px; font-size: 13px; color: #94a3b8; line-height: 1.7;
+  }
+  .summary-bar strong { color: #e2e8f0; }
+
+  /* ── LLM CARDS ── */
+  .llm-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .llm-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 18px 16px;
+    transition: border-color 0.2s;
+  }
+  .llm-card:hover { border-color: rgba(58,143,212,0.4); }
+  .llm-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: #fff; margin-bottom: 10px;
+  }
+  .icon-gpt    { background: #10a37f; }
+  .icon-claude { background: #d97706; }
+  .icon-perp   { background: #6366f1; }
+  .icon-gemini { background: #4285f4; }
+  .icon-grok   { background: #1a1a1a; border: 1px solid #333; }
+
+  .llm-name { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; }
+  .llm-score { font-size: 36px; font-weight: 800; line-height: 1.1; margin: 4px 0 8px; letter-spacing: -1px; }
+  .score-green { color: #22c55e; }
+  .score-blue  { color: #3a8fd4; }
+  .score-amber { color: #f59e0b; }
+  .score-red   { color: #ef4444; }
+
+  .score-bar-track { background: #1e293b; border-radius: 4px; height: 5px; overflow: hidden; margin-bottom: 10px; }
+  .score-bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.9s ease-out; }
+  .fill-green { background: linear-gradient(90deg, #15803d, #22c55e); }
+  .fill-blue  { background: linear-gradient(90deg, #1e5fa0, #3a8fd4); }
+  .fill-amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+  .fill-red   { background: linear-gradient(90deg, #991b1b, #ef4444); }
+
+  .llm-tag { font-size: 10px; font-weight: 700; color: #475569; margin-bottom: 5px; }
+  .llm-gap { font-size: 11px; color: #475569; line-height: 1.4; border-top: 1px solid #1e293b; padding-top: 8px; margin-top: 2px; }
+
+  /* ── CHARTS ── */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .chart-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 22px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .chart-sub { font-size: 11px; color: #475569; margin-bottom: 16px; }
+  .chart-callout {
+    font-size: 11px; color: #64748b; margin-top: 12px;
+    padding: 9px 13px; background: rgba(58,143,212,0.06);
+    border-radius: 6px; border-left: 3px solid #3a8fd4;
+  }
+  .competitor-note {
+    font-size: 11px; color: #64748b; margin-top: 12px;
+    padding: 9px 13px; background: rgba(245,158,11,0.06);
+    border-radius: 6px; border-left: 3px solid #f59e0b;
+  }
+
+  /* ── DIMENSION BREAKDOWN ── */
+  .dim-row { margin-bottom: 16px; }
+  .dim-row:last-child { margin-bottom: 0; }
+  .dim-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .dim-name { color: #cbd5e1; font-size: 13px; font-weight: 500; }
+  .dim-score { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .dim-bar { height: 5px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+  .dim-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* ── QUERY TABLE ── */
+  .query-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    background: #1e293b; padding: 10px 14px; text-align: left;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #64748b; border-bottom: 1px solid #1e293b;
+  }
+  tbody tr { border-bottom: 1px solid #1a2744; transition: background 0.15s; }
+  tbody tr:hover { background: rgba(58,143,212,0.04); }
+  tbody td { padding: 10px 14px; color: #94a3b8; }
+
+  .cat-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+  .cat-branded    { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .cat-category   { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .cat-competitor { background: rgba(251,113,133,0.15); color: #fb7185; }
+  .cat-problem    { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+  .pri-high   { color: #ef4444; font-weight: 700; }
+  .pri-medium { color: #f59e0b; font-weight: 600; }
+  .pri-low    { color: #22c55e; font-weight: 600; }
+
+  /* ── DONUT ── */
+  .donut-layout { display: flex; align-items: center; gap: 28px; }
+  .donut-wrap { width: 180px; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { color: #94a3b8; font-weight: 500; }
+  .legend-pct { color: #475569; margin-left: auto; font-weight: 600; }
+
+  /* ── PLAN CARDS ── */
+  .plan-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 22px 22px 22px 18px;
+    margin-bottom: 10px; display: flex; gap: 18px;
+  }
+  .plan-accent { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; }
+  .acc-1 { background: #22c55e; }
+  .acc-2 { background: #16a34a; }
+  .acc-3 { background: #15803d; }
+  .acc-4 { background: #3a8fd4; }
+  .acc-5 { background: #1e5fa0; }
+
+  .plan-step-num { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; flex-shrink: 0; width: 36px; padding-top: 2px; }
+  .plan-content { flex: 1; }
+  .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
+  .plan-title { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+  .impact-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .impact-high   { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+  .impact-medium { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+  .plan-finding { font-size: 12px; color: #475569; font-style: italic; margin-bottom: 10px; }
+  .plan-actions { list-style: none; padding: 0; }
+  .plan-actions li { font-size: 12px; color: #94a3b8; padding: 4px 0 4px 16px; position: relative; }
+  .plan-actions li::before { content: "→"; position: absolute; left: 0; color: #3a8fd4; font-weight: 700; }
+
+  .type-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 3px 10px; border-radius: 12px; margin-bottom: 6px;
+  }
+  .type-quick { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+  .type-big   { background: rgba(58,143,212,0.12); color: #3a8fd4; border: 1px solid rgba(58,143,212,0.25); }
+
+  /* ── METHODOLOGY ── */
+  .methodology {
+    background: #0a1628; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 20px 24px;
+    font-size: 12px; color: #475569; line-height: 1.7;
+  }
+  .methodology p { margin-bottom: 8px; }
+  .methodology p:last-child { margin-bottom: 0; }
+  .methodology strong { color: #94a3b8; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: #0f172a; border-top: 1px solid #1e293b;
+    color: #334155; text-align: center; padding: 16px 20px;
+    font-size: 11px; position: relative; z-index: 1;
+  }
+  .footer .accent { color: #3a8fd4; font-weight: 600; }
+
+  /* ── PRINT / PDF ── */
+  @media print {
+    .pdf-btn { display: none !important; }
+    body { background: #020617; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .accent-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .plan-accent { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    section { break-inside: avoid; }
+    .plan-card { break-inside: avoid; }
+    .llm-grid { break-inside: avoid; }
+  }
+
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: 1fr; }
+    .llm-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; gap: 12px; }
+    .header-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-brand">
+        <div class="brand-pulse"></div>
+        <span class="brand-label">IndexForge LLM · GEO Performance Report</span>
+      </div>
+      <h1><!-- COMPANY_NAME --></h1>
+      <div class="subtitle">AI Search Visibility Analysis — <!-- DOMAIN --></div>
+    </div>
+    <div class="header-right">
+      <div class="domain"><!-- DOMAIN --></div>
+      <div class="report-date"><!-- REPORT_DATE --></div>
+      <button class="pdf-btn" onclick="downloadPDF()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </button>
+    </div>
+  </div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="container">
+
+  <!-- ══════════════════════════════ SECTION 1: EXECUTIVE SUMMARY -->
+  <section>
+    <div class="section-label">Executive Summary</div>
+    <div class="kpi-row">
+
+      <!-- KPI 1: Overall Score -->
+      <div class="kpi-card">
+        <div>
+          <span class="kpi-number"><!-- OVERALL_SCORE --></span><span class="kpi-grade"><!-- LETTER_GRADE --></span>
+        </div>
+        <!-- Grade badge class: badge-aplus | badge-a | badge-aminus | badge-bplus | badge-b | badge-bminus | badge-cplus | badge-c | badge-cminus | badge-d | badge-f -->
+        <div><span class="kpi-badge <!-- GRADE_BADGE_CLASS -->"><!-- GRADE_LABEL --></span></div>
+        <div class="kpi-label">Overall GEO Score (0–100)</div>
+      </div>
+
+      <!-- KPI 2: Pages Analyzed -->
+      <div class="kpi-card">
+        <!-- PAGES_COUNT: integer, e.g. 5 -->
+        <div class="kpi-sub" style="font-size:42px;margin-top:4px;"><!-- PAGES_COUNT --></div>
+        <div class="kpi-label" style="margin-top:12px;">Pages Analyzed</div>
+        <!-- PAGES_LIST: e.g. "Homepage · About · Services · Blog · Contact" -->
+        <div style="font-size:11px;color:#334155;margin-top:6px;"><!-- PAGES_LIST --></div>
+      </div>
+
+      <!-- KPI 3: Best LLM -->
+      <div class="kpi-card">
+        <!-- BEST_LLM_NAME: e.g. "Claude" -->
+        <div class="kpi-sub" style="font-size:24px;margin-top:10px;"><!-- BEST_LLM_NAME --></div>
+        <!-- BEST_LLM_BADGE_CLASS: badge-a | badge-b | badge-c | badge-d -->
+        <!-- BEST_LLM_SCORE: e.g. 75 -->
+        <div><span class="kpi-badge <!-- BEST_LLM_BADGE_CLASS -->" style="margin-top:6px;">Score: <!-- BEST_LLM_SCORE --></span></div>
+        <div class="kpi-label" style="margin-top:10px;">Best Performing LLM</div>
+      </div>
+
+    </div>
+
+    <!-- Summary paragraph: 2–3 sentences on overall standing and primary gaps -->
+    <div class="summary-bar">
+      <strong>Summary:</strong> <!-- SUMMARY_TEXT -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 2: PER-LLM BREAKDOWN -->
+  <section>
+    <div class="section-label">Platform-by-Platform Breakdown</div>
+    <div class="llm-grid">
+
+      <!-- LLM 1: ChatGPT -->
+      <!-- Score color class: score-green (≥80) | score-blue (65–79) | score-amber (50–64) | score-red (<50) -->
+      <!-- Fill class: fill-green | fill-blue | fill-amber | fill-red -->
+      <div class="llm-card">
+        <div class="llm-icon icon-gpt">GPT</div>
+        <div class="llm-name">ChatGPT / OpenAI</div>
+        <div class="llm-score <!-- CHATGPT_SCORE_CLASS -->"><!-- CHATGPT_SCORE --></div>
+        <div class="score-bar-track"><div class="score-bar-fill <!-- CHATGPT_FILL_CLASS -->" data-width="<!-- CHATGPT_SCORE -->"></div></div>
+        <div class="llm-tag"><!-- CHATGPT_TAG --></div>
+        <div class="llm-gap"><!-- CHATGPT_GAP --></div>
+      </div>
+
+      <!-- LLM 2: Claude -->
+      <div class="llm-card">
+        <div class="llm-icon icon-claude">CL</div>
+        <div class="llm-name">Claude / Anthropic</div>
+        <div class="llm-score <!-- CLAUDE_SCORE_CLASS -->"><!-- CLAUDE_SCORE --></div>
+        <div class="score-bar-track"><div class="score-bar-fill <!-- CLAUDE_FILL_CLASS -->" data-width="<!-- CLAUDE_SCORE -->"></div></div>
+        <div class="llm-tag"><!-- CLAUDE_TAG --></div>
+        <div class="llm-gap"><!-- CLAUDE_GAP --></div>
+      </div>
+
+      <!-- LLM 3: Perplexity -->
+      <div class="llm-card">
+        <div class="llm-icon icon-perp">PX</div>
+        <div class="llm-name">Perplexity</div>
+        <div class="llm-score <!-- PERPLEXITY_SCORE_CLASS -->"><!-- PERPLEXITY_SCORE --></div>
+        <div class="score-bar-track"><div class="score-bar-fill <!-- PERPLEXITY_FILL_CLASS -->" data-width="<!-- PERPLEXITY_SCORE -->"></div></div>
+        <div class="llm-tag"><!-- PERPLEXITY_TAG --></div>
+        <div class="llm-gap"><!-- PERPLEXITY_GAP --></div>
+      </div>
+
+      <!-- LLM 4: Gemini -->
+      <div class="llm-card">
+        <div class="llm-icon icon-gemini">G</div>
+        <div class="llm-name">Gemini / Google</div>
+        <div class="llm-score <!-- GEMINI_SCORE_CLASS -->"><!-- GEMINI_SCORE --></div>
+        <div class="score-bar-track"><div class="score-bar-fill <!-- GEMINI_FILL_CLASS -->" data-width="<!-- GEMINI_SCORE -->"></div></div>
+        <div class="llm-tag"><!-- GEMINI_TAG --></div>
+        <div class="llm-gap"><!-- GEMINI_GAP --></div>
+      </div>
+
+      <!-- LLM 5: Grok -->
+      <div class="llm-card">
+        <div class="llm-icon icon-grok">GK</div>
+        <div class="llm-name">Grok / xAI</div>
+        <div class="llm-score <!-- GROK_SCORE_CLASS -->"><!-- GROK_SCORE --></div>
+        <div class="score-bar-track"><div class="score-bar-fill <!-- GROK_FILL_CLASS -->" data-width="<!-- GROK_SCORE -->"></div></div>
+        <div class="llm-tag"><!-- GROK_TAG --></div>
+        <div class="llm-gap"><!-- GROK_GAP --></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 3: CHARTS ROW -->
+  <section>
+    <div class="chart-row">
+
+      <!-- LEFT: Radar Chart (single company polygon, 6 dimension axes) -->
+      <div class="chart-card">
+        <div class="chart-title">Score Breakdown by Dimension</div>
+        <!-- RADAR_SUBTITLE: e.g. "Company Name · 6 GEO dimensions" -->
+        <div class="chart-sub"><!-- COMPANY_NAME --> · 6 GEO scoring dimensions</div>
+        <canvas id="radarChart" height="260"></canvas>
+        <!-- RADAR_CALLOUT: note strongest and weakest dimension -->
+        <div class="chart-callout"><!-- RADAR_CALLOUT --></div>
+      </div>
+
+      <!-- RIGHT: Competitor Bar Chart -->
+      <div class="chart-card">
+        <div class="chart-title">AI Visibility — Competitor Comparison</div>
+        <!-- COMPETITOR_SUBTITLE: e.g. "How [Company] stacks up against [N] competitors in [space]" -->
+        <div class="chart-sub"><!-- COMPETITOR_SUBTITLE --></div>
+        <canvas id="competitorChart" height="260"></canvas>
+        <!-- COMPETITOR_NOTE: key insight about gap with top competitor -->
+        <div class="competitor-note"><!-- COMPETITOR_NOTE --></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 4: QUERY PERFORMANCE TABLE -->
+  <section>
+    <div class="section-label">Query Performance — How You Appear for Each Search Type</div>
+    <div class="card">
+      <div class="query-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Query</th><th>Category</th><th>Visibility</th><th>Sentiment</th><th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- QUERY_ROWS: Insert 12 <tr> rows below. Use these classes:
+                 Category badge: cat-branded | cat-category | cat-competitor | cat-problem
+                 Visibility: 🟢 High | 🟡 Medium | 🔴 Low
+                 Sentiment: ↑ Positive | → Neutral | ○ No Mention | ↓ Negative
+                 Priority: <span class="pri-high">High</span> | <span class="pri-medium">Medium</span> | <span class="pri-low">Low</span>
+                 Breakdown: 3 Branded, 4 Category, 2–3 Competitor, 3 Problem/Solution
+            -->
+            <!-- QUERY_ROWS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 5: DIMENSION SCORES + SENTIMENT DONUT -->
+  <section>
+    <div class="chart-row">
+
+      <!-- LEFT: Dimension Score Bars -->
+      <div class="chart-card">
+        <div class="chart-title">GEO Dimension Scores</div>
+        <div class="chart-sub">6 weighted categories · 100 points total</div>
+        <div style="margin-top:8px;">
+
+          <!-- Dimension bar color rules (apply to dim-score color AND dim-bar-fill background):
+               ≥75% of max → color:#22c55e, background:linear-gradient(90deg,#15803d,#22c55e)
+               60–74% of max → color:#3a8fd4, background:linear-gradient(90deg,#1e5fa0,#3a8fd4)
+               45–59% of max → color:#f59e0b, background:linear-gradient(90deg,#b45309,#f59e0b)
+               <45% of max → color:#ef4444, background:linear-gradient(90deg,#991b1b,#ef4444)
+               Bar width % = (raw_score / max_score) * 100
+          -->
+
+          <!-- ENTITY_SCORE: raw score out of 20 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Entity Clarity &amp; Brand Definition</span>
+              <span class="dim-score" style="color:<!-- ENTITY_COLOR -->;"><!-- ENTITY_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- ENTITY_PCT -->%;background:<!-- ENTITY_FILL -->;"></div></div>
+          </div>
+
+          <!-- CONTENT_SCORE: raw score out of 20 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Content Signals &amp; AI Readability</span>
+              <span class="dim-score" style="color:<!-- CONTENT_COLOR -->;"><!-- CONTENT_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- CONTENT_PCT -->%;background:<!-- CONTENT_FILL -->;"></div></div>
+          </div>
+
+          <!-- CITATION_SCORE: raw score out of 20 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Citation &amp; Third-Party Presence</span>
+              <span class="dim-score" style="color:<!-- CITATION_COLOR -->;"><!-- CITATION_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- CITATION_PCT -->%;background:<!-- CITATION_FILL -->;"></div></div>
+          </div>
+
+          <!-- SCHEMA_SCORE: raw score out of 15 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Schema Markup &amp; Technical Structure</span>
+              <span class="dim-score" style="color:<!-- SCHEMA_COLOR -->;"><!-- SCHEMA_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 15</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- SCHEMA_PCT -->%;background:<!-- SCHEMA_FILL -->;"></div></div>
+          </div>
+
+          <!-- AUTHORITY_SCORE: raw score out of 15 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Brand Authority &amp; Trust Signals</span>
+              <span class="dim-score" style="color:<!-- AUTHORITY_COLOR -->;"><!-- AUTHORITY_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 15</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- AUTHORITY_PCT -->%;background:<!-- AUTHORITY_FILL -->;"></div></div>
+          </div>
+
+          <!-- TOPICAL_SCORE: raw score out of 10 -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Topical Coverage &amp; Depth</span>
+              <span class="dim-score" style="color:<!-- TOPICAL_COLOR -->;"><!-- TOPICAL_SCORE --> <span style="color:#334155;font-size:11px;font-weight:400;">/ 10</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:<!-- TOPICAL_PCT -->%;background:<!-- TOPICAL_FILL -->;"></div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: Sentiment Donut Chart -->
+      <div class="chart-card">
+        <div class="chart-title">Sentiment Distribution Across All AI Signals</div>
+        <!-- e.g. "12 queries analyzed · 4 query categories" -->
+        <div class="chart-sub">12 queries analyzed · 4 query categories</div>
+        <div class="donut-layout" style="margin-top:16px;">
+          <div class="donut-wrap"><canvas id="donutChart" width="180" height="180"></canvas></div>
+          <div>
+            <!-- SENTIMENT_POSITIVE_PCT: e.g. "33%" -->
+            <div style="font-size:32px;font-weight:800;color:#22c55e;line-height:1;margin-bottom:4px;"><!-- SENTIMENT_POSITIVE_PCT --></div>
+            <div style="font-size:12px;color:#475569;margin-bottom:18px;">of signals are positive</div>
+            <!-- SENTIMENT_POSITIVE_COUNT, SENTIMENT_NEUTRAL_COUNT, SENTIMENT_NEGATIVE_COUNT, SENTIMENT_NOT_MENTIONED_COUNT -->
+            <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span class="legend-label">Positive</span><span class="legend-pct"><!-- SENTIMENT_POSITIVE_COUNT --> · <!-- SENTIMENT_POSITIVE_PCT_LEGEND --></span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div><span class="legend-label">Neutral</span><span class="legend-pct"><!-- SENTIMENT_NEUTRAL_COUNT --> · <!-- SENTIMENT_NEUTRAL_PCT --></span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div><span class="legend-label">Negative</span><span class="legend-pct"><!-- SENTIMENT_NEGATIVE_COUNT --> · <!-- SENTIMENT_NEGATIVE_PCT --></span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1e293b;border:1px solid #334155;"></div><span class="legend-label">Not Mentioned</span><span class="legend-pct"><!-- SENTIMENT_NOT_MENTIONED_COUNT --> · <!-- SENTIMENT_NOT_MENTIONED_PCT --></span></div>
+            <!-- SENTIMENT_CALLOUT: 1–2 sentence insight, e.g. "Zero negative mentions is a strength. The gap is reach, not reputation." -->
+            <div style="margin-top:12px;font-size:11px;color:#475569;padding:9px 12px;background:rgba(58,143,212,0.06);border-radius:6px;"><!-- SENTIMENT_CALLOUT --></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 6: 5-STEP IMPROVEMENT PLAN -->
+  <section>
+    <div class="section-label">5-Step GEO Improvement Plan — Prioritized by Score Impact</div>
+
+    <!-- STEP 1 — Quick Win (acc-1: #22c55e) -->
+    <div class="plan-card">
+      <div class="plan-accent acc-1"></div>
+      <div class="plan-step-num">01</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <!-- STEP1_TITLE -->
+            <div class="plan-title"><!-- STEP1_TITLE --></div>
+          </div>
+          <!-- STEP1_IMPACT: impact-high | impact-medium -->
+          <span class="impact-badge <!-- STEP1_IMPACT_CLASS -->"><!-- STEP1_IMPACT_LABEL --></span>
+        </div>
+        <!-- STEP1_FINDING: italic sentence from rubric finding -->
+        <div class="plan-finding">Finding: <!-- STEP1_FINDING --></div>
+        <ul class="plan-actions">
+          <!-- STEP1_ACTIONS: 2–3 <li> items, specific and actionable -->
+          <!-- STEP1_ACTIONS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEP 2 — Quick Win (acc-2: #16a34a) -->
+    <div class="plan-card">
+      <div class="plan-accent acc-2"></div>
+      <div class="plan-step-num">02</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <div class="plan-title"><!-- STEP2_TITLE --></div>
+          </div>
+          <span class="impact-badge <!-- STEP2_IMPACT_CLASS -->"><!-- STEP2_IMPACT_LABEL --></span>
+        </div>
+        <div class="plan-finding">Finding: <!-- STEP2_FINDING --></div>
+        <ul class="plan-actions">
+          <!-- STEP2_ACTIONS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEP 3 — Quick Win (acc-3: #15803d) -->
+    <div class="plan-card">
+      <div class="plan-accent acc-3"></div>
+      <div class="plan-step-num">03</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <div class="plan-title"><!-- STEP3_TITLE --></div>
+          </div>
+          <span class="impact-badge <!-- STEP3_IMPACT_CLASS -->"><!-- STEP3_IMPACT_LABEL --></span>
+        </div>
+        <div class="plan-finding">Finding: <!-- STEP3_FINDING --></div>
+        <ul class="plan-actions">
+          <!-- STEP3_ACTIONS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEP 4 — Big Picture (acc-4: #3a8fd4) -->
+    <div class="plan-card">
+      <div class="plan-accent acc-4"></div>
+      <div class="plan-step-num">04</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-big">🎯 Big Picture</div>
+            <div class="plan-title"><!-- STEP4_TITLE --></div>
+          </div>
+          <span class="impact-badge <!-- STEP4_IMPACT_CLASS -->"><!-- STEP4_IMPACT_LABEL --></span>
+        </div>
+        <div class="plan-finding">Finding: <!-- STEP4_FINDING --></div>
+        <ul class="plan-actions">
+          <!-- STEP4_ACTIONS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- STEP 5 — Big Picture (acc-5: #1e5fa0) -->
+    <div class="plan-card">
+      <div class="plan-accent acc-5"></div>
+      <div class="plan-step-num">05</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-big">🎯 Big Picture</div>
+            <div class="plan-title"><!-- STEP5_TITLE --></div>
+          </div>
+          <span class="impact-badge <!-- STEP5_IMPACT_CLASS -->"><!-- STEP5_IMPACT_LABEL --></span>
+        </div>
+        <div class="plan-finding">Finding: <!-- STEP5_FINDING --></div>
+        <ul class="plan-actions">
+          <!-- STEP5_ACTIONS -->
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════ SECTION 7: METHODOLOGY -->
+  <section>
+    <div class="section-label">Methodology</div>
+    <div class="methodology">
+      <p>GEO scores in this report are <strong>inferred from web presence signals</strong> — not live API queries to each LLM platform. This is intentional: the signals that predict LLM visibility (entity consistency, content authority, citation volume, structured data, and review presence) are the same signals you can directly control and improve. A live query shows a snapshot; this methodology shows you why you rank where you do and what to fix.</p>
+      <p>Overall scoring uses a weighted composite of 6 dimensions: Entity Clarity (20pts), Content Signals (20pts), Citation Presence (20pts), Schema &amp; Technical Structure (15pts), Brand Authority (15pts), and Topical Coverage (10pts). Per-platform scores are adjusted from the baseline using each LLM's known signal weighting tendencies — not live query results.</p>
+      <p>Competitor scores are estimated using the same methodology applied to publicly available signals. These are directional benchmarks, not exact measurements. Report prepared by <strong style="color:#3a8fd4;">IndexForge LLM</strong>.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  GEO Report &nbsp;|&nbsp; <!-- COMPANY_NAME --> &nbsp;|&nbsp; <!-- REPORT_DATE --> &nbsp;|&nbsp; Prepared by <span class="accent">IndexForge LLM</span> &nbsp;|&nbsp; hello@indexforgellm.com
+</div>
+
+<script>
+  // ── Animate score bars on load ──
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.score-bar-fill').forEach(bar => {
+      const w = bar.getAttribute('data-width');
+      setTimeout(() => { bar.style.width = w + '%'; }, 300);
+    });
+  });
+
+  // ── PDF Export ──
+  function downloadPDF() {
+    const btn = document.querySelector('.pdf-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Generating…';
+    btn.disabled = true;
+    const opt = {
+      margin: [8, 8, 8, 8],
+      // PDF_FILENAME: e.g. 'AcmeConsulting-GEO-Report-2026-03-18.pdf'
+      filename: '<!-- PDF_FILENAME -->',
+      image: { type: 'jpeg', quality: 0.97 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#020617' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+    html2pdf().set(opt).from(document.body).save().then(() => {
+      btn.innerHTML = orig; btn.disabled = false;
+    }).catch(() => {
+      btn.innerHTML = orig; btn.disabled = false;
+    });
+  }
+
+  const gridColor  = 'rgba(30,41,59,0.8)';
+  const tickColor  = '#475569';
+  const labelColor = '#94a3b8';
+
+  // ── RADAR CHART (single company polygon, 6 dimension axes normalized to 0–100) ──
+  // Normalize each dimension: (raw_score / max_score) * 100, round to nearest integer
+  // Entity max=20, Content max=20, Citation max=20, Schema max=15, Authority max=15, Topical max=10
+  new Chart(document.getElementById('radarChart').getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: ['Entity Clarity', 'Content Signals', 'Citation Presence', 'Schema & Tech', 'Brand Authority', 'Topical Depth'],
+      datasets: [{
+        label: '<!-- COMPANY_NAME -->',
+        // RADAR_DATA: [ENTITY_NORMALIZED, CONTENT_NORMALIZED, CITATION_NORMALIZED, SCHEMA_NORMALIZED, AUTHORITY_NORMALIZED, TOPICAL_NORMALIZED]
+        data: [<!-- RADAR_ENTITY -->, <!-- RADAR_CONTENT -->, <!-- RADAR_CITATION -->, <!-- RADAR_SCHEMA -->, <!-- RADAR_AUTHORITY -->, <!-- RADAR_TOPICAL -->],
+        borderColor: '#3a8fd4',
+        backgroundColor: 'rgba(58,143,212,0.12)',
+        borderWidth: 2,
+        pointBackgroundColor: '#3a8fd4',
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 9 }, color: tickColor, backdropColor: 'transparent' },
+          pointLabels: { font: { size: 10, weight: '600' }, color: labelColor },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.r}` } }
+      }
+    }
+  });
+
+  // ── COMPETITOR BAR CHART (horizontal) ──
+  // Company is always first entry and highlighted with #3a8fd4; competitors use #334155
+  // COMPETITOR_LABELS: JSON array, company name first, e.g. ["Acme Consulting", "Competitor A", "Competitor B", "Competitor C", "Competitor D"]
+  // COMPETITOR_DATA: JSON array of integer scores in same order
+  // COMPETITOR_COLORS: JSON array — first entry "#3a8fd4", rest "#334155"
+  new Chart(document.getElementById('competitorChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: <!-- COMPETITOR_LABELS -->,
+      datasets: [{
+        label: 'AI Visibility Score',
+        data: <!-- COMPETITOR_DATA -->,
+        backgroundColor: <!-- COMPETITOR_COLORS -->,
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      scales: {
+        x: { min: 0, max: 100, ticks: { font: { size: 10 }, color: tickColor }, grid: { color: gridColor } },
+        y: { ticks: { font: { size: 11 }, color: labelColor }, grid: { display: false } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` GEO Score: ${ctx.parsed.x} / 100` } }
+      }
+    }
+  });
+
+  // ── SENTIMENT DONUT ──
+  // DONUT_DATA: [POSITIVE_COUNT, NEUTRAL_COUNT, NEGATIVE_COUNT, NOT_MENTIONED_COUNT]
+  new Chart(document.getElementById('donutChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Positive', 'Neutral', 'Negative', 'Not Mentioned'],
+      datasets: [{
+        data: [<!-- SENTIMENT_POSITIVE_COUNT -->, <!-- SENTIMENT_NEUTRAL_COUNT -->, <!-- SENTIMENT_NEGATIVE_COUNT -->, <!-- SENTIMENT_NOT_MENTIONED_COUNT -->],
+        backgroundColor: ['#22c55e', '#94a3b8', '#ef4444', '#1e293b'],
+        borderWidth: 2,
+        borderColor: '#020617',
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} queries` } }
+      }
+    }
+  });
+</script>
+</body>
+</html>

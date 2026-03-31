@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GEO Performance Report — Acme Consulting Group</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #020617;
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(58,143,212,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 28px 40px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .brand-pulse { width: 7px; height: 7px; border-radius: 50%; background: #3a8fd4; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .brand-label { color: #3a8fd4; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+  .header h1 { color: #fff; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .header .subtitle { color: #64748b; font-size: 13px; margin-top: 3px; }
+  .header-right { text-align: right; }
+  .header-right .domain { color: #3a8fd4; font-size: 14px; font-weight: 700; }
+  .header-right .report-date { color: #475569; font-size: 12px; margin-top: 3px; }
+
+  .pdf-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 8px 16px;
+    background: #3a8fd4; color: #fff;
+    font-size: 12px; font-weight: 700;
+    border: none; border-radius: 6px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .pdf-btn:hover { background: #4fa8f0; }
+
+  .accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #1e5fa0 0%, #3a8fd4 40%, #4fa8f0 70%, #3a8fd4 100%);
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 36px 20px; position: relative; z-index: 1; }
+  section { margin-bottom: 36px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #3a8fd4; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #1e293b; }
+
+  .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 22px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .kpi-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 26px 22px; text-align: center;
+  }
+  .kpi-number { font-size: 52px; font-weight: 800; line-height: 1; color: #fff; letter-spacing: -2px; }
+  .kpi-grade { color: #3a8fd4; font-size: 28px; font-weight: 800; margin-left: 6px; }
+  .kpi-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+  .badge-aplus  { background: rgba(34,197,94,0.2);   color: #22c55e; border: 1px solid rgba(34,197,94,0.4); }
+  .badge-a      { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .badge-aminus { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+  .badge-bplus  { background: rgba(58,143,212,0.2);  color: #60a5fa; border: 1px solid rgba(58,143,212,0.35); }
+  .badge-b      { background: rgba(58,143,212,0.15); color: #3a8fd4; border: 1px solid rgba(58,143,212,0.3); }
+  .badge-bminus { background: rgba(58,143,212,0.12); color: #7ab8e8; border: 1px solid rgba(58,143,212,0.25); }
+  .badge-cplus  { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .badge-c      { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+  .badge-cminus { background: rgba(245,158,11,0.1);  color: #d97706; border: 1px solid rgba(245,158,11,0.2); }
+  .badge-d      { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+  .badge-f      { background: rgba(239,68,68,0.18);  color: #ef4444; border: 1px solid rgba(239,68,68,0.35); }
+  .kpi-label { font-size: 11px; color: #475569; margin-top: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-sub { font-size: 20px; font-weight: 700; color: #fff; margin-top: 8px; }
+
+  .summary-bar {
+    margin-top: 14px; padding: 14px 20px;
+    background: #0f172a; border: 1px solid #1e293b;
+    border-left: 4px solid #3a8fd4;
+    border-radius: 8px; font-size: 13px; color: #94a3b8; line-height: 1.7;
+  }
+  .summary-bar strong { color: #e2e8f0; }
+
+  .llm-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .llm-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 18px 16px;
+    transition: border-color 0.2s;
+  }
+  .llm-card:hover { border-color: rgba(58,143,212,0.4); }
+  .llm-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 12px; color: #fff; margin-bottom: 10px;
+  }
+  .icon-gpt    { background: #10a37f; }
+  .icon-claude { background: #d97706; }
+  .icon-perp   { background: #6366f1; }
+  .icon-gemini { background: #4285f4; }
+  .icon-grok   { background: #1a1a1a; border: 1px solid #333; }
+
+  .llm-name { font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; }
+  .llm-score { font-size: 36px; font-weight: 800; line-height: 1.1; margin: 4px 0 8px; letter-spacing: -1px; }
+  .score-green { color: #22c55e; }
+  .score-blue  { color: #3a8fd4; }
+  .score-amber { color: #f59e0b; }
+  .score-red   { color: #ef4444; }
+
+  .score-bar-track { background: #1e293b; border-radius: 4px; height: 5px; overflow: hidden; margin-bottom: 10px; }
+  .score-bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.9s ease-out; }
+  .fill-green { background: linear-gradient(90deg, #15803d, #22c55e); }
+  .fill-blue  { background: linear-gradient(90deg, #1e5fa0, #3a8fd4); }
+  .fill-amber { background: linear-gradient(90deg, #b45309, #f59e0b); }
+  .fill-red   { background: linear-gradient(90deg, #991b1b, #ef4444); }
+
+  .llm-tag { font-size: 10px; font-weight: 700; color: #475569; margin-bottom: 5px; }
+  .llm-gap { font-size: 11px; color: #475569; line-height: 1.4; border-top: 1px solid #1e293b; padding-top: 8px; margin-top: 2px; }
+
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .chart-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 22px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .chart-sub { font-size: 11px; color: #475569; margin-bottom: 16px; }
+  .chart-callout {
+    font-size: 11px; color: #64748b; margin-top: 12px;
+    padding: 9px 13px; background: rgba(58,143,212,0.06);
+    border-radius: 6px; border-left: 3px solid #3a8fd4;
+  }
+  .competitor-note {
+    font-size: 11px; color: #64748b; margin-top: 12px;
+    padding: 9px 13px; background: rgba(245,158,11,0.06);
+    border-radius: 6px; border-left: 3px solid #f59e0b;
+  }
+
+  .dim-row { margin-bottom: 16px; }
+  .dim-row:last-child { margin-bottom: 0; }
+  .dim-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .dim-name { color: #cbd5e1; font-size: 13px; font-weight: 500; }
+  .dim-score { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .dim-bar { height: 5px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+  .dim-bar-fill { height: 100%; border-radius: 3px; }
+
+  .query-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    background: #1e293b; padding: 10px 14px; text-align: left;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #64748b; border-bottom: 1px solid #1e293b;
+  }
+  tbody tr { border-bottom: 1px solid #1a2744; transition: background 0.15s; }
+  tbody tr:hover { background: rgba(58,143,212,0.04); }
+  tbody td { padding: 10px 14px; color: #94a3b8; }
+
+  .cat-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+  .cat-branded    { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .cat-category   { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .cat-competitor { background: rgba(251,113,133,0.15); color: #fb7185; }
+  .cat-problem    { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+  .pri-high   { color: #ef4444; font-weight: 700; }
+  .pri-medium { color: #f59e0b; font-weight: 600; }
+  .pri-low    { color: #22c55e; font-weight: 600; }
+
+  .donut-layout { display: flex; align-items: center; gap: 28px; }
+  .donut-wrap { width: 180px; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { color: #94a3b8; font-weight: 500; }
+  .legend-pct { color: #475569; margin-left: auto; font-weight: 600; }
+
+  .plan-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 22px 22px 22px 18px;
+    margin-bottom: 10px; display: flex; gap: 18px;
+  }
+  .plan-accent { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; }
+  .acc-1 { background: #22c55e; }
+  .acc-2 { background: #16a34a; }
+  .acc-3 { background: #15803d; }
+  .acc-4 { background: #3a8fd4; }
+  .acc-5 { background: #1e5fa0; }
+
+  .plan-step-num { font-size: 32px; font-weight: 800; color: #1e293b; line-height: 1; flex-shrink: 0; width: 36px; padding-top: 2px; }
+  .plan-content { flex: 1; }
+  .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
+  .plan-title { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+  .impact-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .impact-high   { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+  .impact-medium { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); }
+  .plan-finding { font-size: 12px; color: #475569; font-style: italic; margin-bottom: 10px; }
+  .plan-actions { list-style: none; padding: 0; }
+  .plan-actions li { font-size: 12px; color: #94a3b8; padding: 4px 0 4px 16px; position: relative; }
+  .plan-actions li::before { content: "→"; position: absolute; left: 0; color: #3a8fd4; font-weight: 700; }
+
+  .type-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 3px 10px; border-radius: 12px; margin-bottom: 6px;
+  }
+  .type-quick { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+  .type-big   { background: rgba(58,143,212,0.12); color: #3a8fd4; border: 1px solid rgba(58,143,212,0.25); }
+
+  .methodology {
+    background: #0a1628; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 20px 24px;
+    font-size: 12px; color: #475569; line-height: 1.7;
+  }
+  .methodology p { margin-bottom: 8px; }
+  .methodology p:last-child { margin-bottom: 0; }
+  .methodology strong { color: #94a3b8; }
+
+  .footer {
+    background: #0f172a; border-top: 1px solid #1e293b;
+    color: #334155; text-align: center; padding: 16px 20px;
+    font-size: 11px; position: relative; z-index: 1;
+  }
+  .footer .accent { color: #3a8fd4; font-weight: 600; }
+
+  @media print {
+    .pdf-btn { display: none !important; }
+    body { background: #020617; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .accent-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .plan-accent { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    section { break-inside: avoid; }
+    .plan-card { break-inside: avoid; }
+    .llm-grid { break-inside: avoid; }
+  }
+
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: 1fr; }
+    .llm-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; gap: 12px; }
+    .header-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-brand">
+        <div class="brand-pulse"></div>
+        <span class="brand-label">IndexForge LLM · GEO Performance Report</span>
+      </div>
+      <h1>Acme Consulting Group</h1>
+      <div class="subtitle">AI Search Visibility Analysis — acmeconsulting.com</div>
+    </div>
+    <div class="header-right">
+      <div class="domain">acmeconsulting.com</div>
+      <div class="report-date">March 18, 2026</div>
+      <button class="pdf-btn" onclick="downloadPDF()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </button>
+    </div>
+  </div>
+</div>
+<div class="accent-bar"></div>
+
+<div class="container">
+
+  <!-- SECTION 1: EXECUTIVE SUMMARY -->
+  <section>
+    <div class="section-label">Executive Summary</div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div><span class="kpi-number">72</span><span class="kpi-grade">B-</span></div>
+        <div><span class="kpi-badge badge-bminus">Solid Visibility</span></div>
+        <div class="kpi-label">Overall GEO Score (0–100)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-sub" style="font-size:42px;margin-top:4px;">5</div>
+        <div class="kpi-label" style="margin-top:12px;">Pages Analyzed</div>
+        <div style="font-size:11px;color:#334155;margin-top:6px;">Homepage · About · Services · Blog · Contact</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-sub" style="font-size:24px;margin-top:10px;">Claude</div>
+        <div><span class="kpi-badge badge-b" style="margin-top:6px;">Score: 75</span></div>
+        <div class="kpi-label" style="margin-top:10px;">Best Performing LLM</div>
+      </div>
+    </div>
+    <div class="summary-bar">
+      <strong>Summary:</strong> Acme Consulting Group has a <strong>solid GEO foundation</strong> with strong entity signals (16/20) and decent content depth, but a <strong>thin third-party citation profile (11/20)</strong> and <strong>below-par brand authority (8/15)</strong> are the primary gaps suppressing visibility in category and comparison queries. <strong>Claude (75)</strong> is the strongest platform due to good E-E-A-T signals on service pages; <strong>Grok (62)</strong> is the weakest due to minimal social/X presence. Closing the citation and schema gaps would push the overall score into the B+ range.
+    </div>
+  </section>
+
+  <!-- SECTION 2: PER-LLM BREAKDOWN -->
+  <section>
+    <div class="section-label">Platform-by-Platform Breakdown</div>
+    <div class="llm-grid">
+
+      <div class="llm-card">
+        <div class="llm-icon icon-gpt">GPT</div>
+        <div class="llm-name">ChatGPT / OpenAI</div>
+        <div class="llm-score score-amber">68</div>
+        <div class="score-bar-track"><div class="score-bar-fill fill-amber" data-width="68"></div></div>
+        <div class="llm-tag">Entity Gap</div>
+        <div class="llm-gap">Citation score below threshold triggers a −3 penalty. No Wikipedia or Wikidata entry compounds the risk — ChatGPT defaults to better-cited competitors in category queries.</div>
+      </div>
+
+      <div class="llm-card">
+        <div class="llm-icon icon-claude">CL</div>
+        <div class="llm-name">Claude / Anthropic</div>
+        <div class="llm-score score-blue">75</div>
+        <div class="score-bar-track"><div class="score-bar-fill fill-blue" data-width="75"></div></div>
+        <div class="llm-tag">Best Platform</div>
+        <div class="llm-gap">Strong E-E-A-T signals on service pages align well with Claude's content-depth weighting. Only minor authority penalty applied (−2). Improving the About page would push this higher.</div>
+      </div>
+
+      <div class="llm-card">
+        <div class="llm-icon icon-perp">PX</div>
+        <div class="llm-name">Perplexity</div>
+        <div class="llm-score score-blue">69</div>
+        <div class="score-bar-track"><div class="score-bar-fill fill-blue" data-width="69"></div></div>
+        <div class="llm-tag">Citation Gap</div>
+        <div class="llm-gap">Perplexity does live web searches — citation volume is the limiting factor here. The −8 citation penalty is partially offset by detectable directory presence, landing at 69. More third-party mentions would directly lift this score.</div>
+      </div>
+
+      <div class="llm-card">
+        <div class="llm-icon icon-gemini">G</div>
+        <div class="llm-name">Gemini / Google</div>
+        <div class="llm-score score-blue">74</div>
+        <div class="score-bar-track"><div class="score-bar-fill fill-blue" data-width="74"></div></div>
+        <div class="llm-tag">Schema Opportunity</div>
+        <div class="llm-gap">GBP signals provide a baseline boost (+4 LocalBusiness bonus). Missing FAQPage schema and no Organization markup is leaving 6+ Gemini points on the table — this is the highest-leverage fix for this platform.</div>
+      </div>
+
+      <div class="llm-card">
+        <div class="llm-icon icon-grok">GK</div>
+        <div class="llm-name">Grok / xAI</div>
+        <div class="llm-score score-amber">62</div>
+        <div class="score-bar-track"><div class="score-bar-fill fill-amber" data-width="62"></div></div>
+        <div class="llm-tag">Weakest Platform</div>
+        <div class="llm-gap">No detectable X/Twitter presence triggers the maximum −10 penalty cap (−8 social + −3 citation, capped). Grok weights real-time social signals heavily — without an active X presence, this score is structurally suppressed.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 3: CHARTS ROW -->
+  <section>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title">Score Breakdown by Dimension</div>
+        <div class="chart-sub">Acme Consulting Group · 6 GEO scoring dimensions</div>
+        <canvas id="radarChart" height="260"></canvas>
+        <div class="chart-callout"><strong>Strongest:</strong> Entity Clarity (80/100 normalized) — consistent brand signals and a solid About page. &nbsp;|&nbsp; <strong>Weakest:</strong> Brand Authority (53/100) — the primary area holding back the overall score.</div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">AI Visibility — Competitor Comparison</div>
+        <div class="chart-sub">How Acme stacks up against 4 competitors in the strategy consulting space</div>
+        <canvas id="competitorChart" height="260"></canvas>
+        <div class="competitor-note">⚠ <strong>McKinsey Partners outscores Acme by 14 points</strong> — driven by a 5x larger citation profile, Wikipedia presence, and active FAQ schema across all service pages.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: QUERY TABLE -->
+  <section>
+    <div class="section-label">Query Performance — How You Appear for Each Search Type</div>
+    <div class="card">
+      <div class="query-table-wrap">
+        <table>
+          <thead>
+            <tr><th>Query</th><th>Category</th><th>Visibility</th><th>Sentiment</th><th>Priority</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>"Acme Consulting Group"</td><td><span class="cat-badge cat-branded">Branded</span></td><td>🟢 High</td><td>↑ Positive</td><td><span class="pri-low">Low</span></td></tr>
+            <tr><td>"Acme Consulting Group reviews"</td><td><span class="cat-badge cat-branded">Branded</span></td><td>🟢 High</td><td>↑ Positive</td><td><span class="pri-low">Low</span></td></tr>
+            <tr><td>"Acme Consulting strategy services"</td><td><span class="cat-badge cat-branded">Branded</span></td><td>🟡 Medium</td><td>↑ Positive</td><td><span class="pri-medium">Medium</span></td></tr>
+            <tr><td>"best strategy consulting firms [city]"</td><td><span class="cat-badge cat-category">Category</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"top business consultants near me"</td><td><span class="cat-badge cat-category">Category</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"small business strategy consulting"</td><td><span class="cat-badge cat-category">Category</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"independent consulting firms for SMBs"</td><td><span class="cat-badge cat-category">Category</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"Acme Consulting vs McKinsey"</td><td><span class="cat-badge cat-competitor">Competitor</span></td><td>🟡 Medium</td><td>→ Neutral</td><td><span class="pri-medium">Medium</span></td></tr>
+            <tr><td>"boutique consulting firms vs big 4"</td><td><span class="cat-badge cat-competitor">Competitor</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"how to choose a business consultant"</td><td><span class="cat-badge cat-problem">Problem/Solution</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"when should I hire a strategy consultant"</td><td><span class="cat-badge cat-problem">Problem/Solution</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+            <tr><td>"ROI of hiring a business consultant"</td><td><span class="cat-badge cat-problem">Problem/Solution</span></td><td>🔴 Low</td><td>○ No Mention</td><td><span class="pri-high">High</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: DIMENSION SCORES + SENTIMENT DONUT -->
+  <section>
+    <div class="chart-row">
+
+      <div class="chart-card">
+        <div class="chart-title">GEO Dimension Scores</div>
+        <div class="chart-sub">6 weighted categories · 100 points total</div>
+        <div style="margin-top:8px;">
+
+          <!-- Entity: 16/20 = 80% → green -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Entity Clarity &amp; Brand Definition</span>
+              <span class="dim-score" style="color:#22c55e;">16 <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:80%;background:linear-gradient(90deg,#15803d,#22c55e);"></div></div>
+          </div>
+
+          <!-- Content: 14/20 = 70% → blue -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Content Signals &amp; AI Readability</span>
+              <span class="dim-score" style="color:#3a8fd4;">14 <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:70%;background:linear-gradient(90deg,#1e5fa0,#3a8fd4);"></div></div>
+          </div>
+
+          <!-- Citation: 11/20 = 55% → amber -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Citation &amp; Third-Party Presence</span>
+              <span class="dim-score" style="color:#f59e0b;">11 <span style="color:#334155;font-size:11px;font-weight:400;">/ 20</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:55%;background:linear-gradient(90deg,#b45309,#f59e0b);"></div></div>
+          </div>
+
+          <!-- Schema: 10/15 = 67% → blue -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Schema Markup &amp; Technical Structure</span>
+              <span class="dim-score" style="color:#3a8fd4;">10 <span style="color:#334155;font-size:11px;font-weight:400;">/ 15</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:67%;background:linear-gradient(90deg,#1e5fa0,#3a8fd4);"></div></div>
+          </div>
+
+          <!-- Authority: 8/15 = 53% → amber -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Brand Authority &amp; Trust Signals</span>
+              <span class="dim-score" style="color:#f59e0b;">8 <span style="color:#334155;font-size:11px;font-weight:400;">/ 15</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:53%;background:linear-gradient(90deg,#b45309,#f59e0b);"></div></div>
+          </div>
+
+          <!-- Topical: 7/10 = 70% → blue -->
+          <div class="dim-row">
+            <div class="dim-header">
+              <span class="dim-name">Topical Coverage &amp; Depth</span>
+              <span class="dim-score" style="color:#3a8fd4;">7 <span style="color:#334155;font-size:11px;font-weight:400;">/ 10</span></span>
+            </div>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:70%;background:linear-gradient(90deg,#1e5fa0,#3a8fd4);"></div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">Sentiment Distribution Across All AI Signals</div>
+        <div class="chart-sub">12 queries analyzed · 4 query categories</div>
+        <div class="donut-layout" style="margin-top:16px;">
+          <div class="donut-wrap"><canvas id="donutChart" width="180" height="180"></canvas></div>
+          <div>
+            <div style="font-size:32px;font-weight:800;color:#22c55e;line-height:1;margin-bottom:4px;">33%</div>
+            <div style="font-size:12px;color:#475569;margin-bottom:18px;">of signals are positive</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span class="legend-label">Positive</span><span class="legend-pct">4 · 33%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div><span class="legend-label">Neutral</span><span class="legend-pct">1 · 8%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div><span class="legend-label">Negative</span><span class="legend-pct">0 · 0%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1e293b;border:1px solid #334155;"></div><span class="legend-label">Not Mentioned</span><span class="legend-pct">7 · 58%</span></div>
+            <div style="margin-top:12px;font-size:11px;color:#475569;padding:9px 12px;background:rgba(58,143,212,0.06);border-radius:6px;">Zero negative mentions is a genuine strength. The gap is reach — not reputation. Acme simply doesn't appear in the queries where clients are making decisions.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 6: IMPROVEMENT PLAN -->
+  <section>
+    <div class="section-label">5-Step GEO Improvement Plan — Prioritized by Score Impact</div>
+
+    <div class="plan-card">
+      <div class="plan-accent acc-1"></div>
+      <div class="plan-step-num">01</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <div class="plan-title">Implement Organization and FAQPage Schema Markup</div>
+          </div>
+          <span class="impact-badge impact-high">High Impact</span>
+        </div>
+        <div class="plan-finding">Finding: No Organization, LocalBusiness, or FAQPage schema detected on any page. This is the single highest-leverage GEO fix — Gemini and Perplexity pull directly from structured data in AI-generated answers, and a missing Organization schema means LLMs cannot confidently identify what Acme Consulting is or cite it accurately.</div>
+        <ul class="plan-actions">
+          <li>Add Organization schema to the homepage with consistent name, URL, logo, founding year, service area, and social profile links. This is the foundation — every other schema type builds on it.</li>
+          <li>Add FAQPage schema to your top 3 service pages using the questions clients actually ask. Use verbatim question phrasing as the schema Q field — these become direct LLM citation sources for category queries.</li>
+          <li>Validate all schema using Google's Rich Results Test (search.google.com/test/rich-results) before publishing. Fix any errors flagged — broken schema is treated as absent by crawlers.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-accent acc-2"></div>
+      <div class="plan-step-num">02</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <div class="plan-title">Add Attributed Testimonials and a Visible Review Aggregate</div>
+          </div>
+          <span class="impact-badge impact-high">High Impact</span>
+        </div>
+        <div class="plan-finding">Finding: Brand Authority scored 8/15 — testimonials on the site are generic with no names or company attributions. LLMs treat unattributed testimonials as non-evidence. Two qualifying E-E-A-T signals exist, but named case studies or attributed testimonials are absent, which triggers the Claude penalty and suppresses trust signals across all platforms.</div>
+        <ul class="plan-actions">
+          <li>Convert existing generic testimonials to attributed quotes: name, title, company, and one measurable outcome (e.g., "reduced operating costs by 22% in 6 months"). Real attribution turns a testimonial into a citable fact.</li>
+          <li>Add a visible review aggregate badge (Google or Clutch) to the homepage footer and service pages. Even a widget showing "4.8 stars · 24 reviews" signals third-party validation to LLMs that process on-page content.</li>
+          <li>Add Review/AggregateRating schema once the widget is in place. This surfaces the rating directly in AI-generated summaries about the firm.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-accent acc-3"></div>
+      <div class="plan-step-num">03</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-quick">⚡ Quick Win</div>
+            <div class="plan-title">Restructure the About Page as a Machine-Readable Entity Profile</div>
+          </div>
+          <span class="impact-badge impact-medium">Medium Impact</span>
+        </div>
+        <div class="plan-finding">Finding: The About page exists but lacks the structured entity signals LLMs use to identify and describe a firm — no founding year stated, no named principals with credentials, no service area explicitly defined, and no external validation anchors (associations, certifications, awards).</div>
+        <ul class="plan-actions">
+          <li>Add a "Who We Are" section with: founding year, named principals with titles and credentials, explicit service area (geography + industry), and the firm's core differentiator stated in one sentence. These are the facts LLMs cite when answering "who is Acme Consulting?"</li>
+          <li>List every association membership, certification, or award the firm holds — even chamber of commerce membership counts. External validation anchors are direct citation triggers for ChatGPT and Claude.</li>
+          <li>Link to LinkedIn profiles from the About page and ensure those profiles list Acme Consulting consistently. LinkedIn is indexed in LLM training data and cross-references entity signals from the website.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-accent acc-4"></div>
+      <div class="plan-step-num">04</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-big">🎯 Big Picture</div>
+            <div class="plan-title">Build a Third-Party Citation Profile Across Industry Directories</div>
+          </div>
+          <span class="impact-badge impact-high">High Impact</span>
+        </div>
+        <div class="plan-finding">Finding: Citation &amp; Third-Party Presence scored 11/20 — the second-lowest dimension. Only 1–2 directory listings are detectable on the site. This is the direct cause of the Grok, ChatGPT, and Perplexity penalties. Competitors with 2–3x more citations consistently outrank in category queries — external mentions are a primary signal AI systems use to validate brand legitimacy.</div>
+        <ul class="plan-actions">
+          <li>Get listed on every relevant consulting directory within 30 days: Clutch.co (the most LLM-indexed consulting directory), G2, Expertise.com, SCORE mentor network, and your local chamber of commerce. Each listing is an independent citation that LLMs treat as a separate brand validation signal.</li>
+          <li>Pursue one authoritative press mention per quarter — a single citation in a business journal (local or trade) does more for LLM visibility than 20 directory listings. Pitch your firm's niche expertise angle to regional business press and industry newsletters.</li>
+          <li>Answer 4–6 questions per month on Quora and Reddit in /r/smallbusiness and /r/consulting. These platforms are heavily indexed in LLM training data. Include your firm name and credentials naturally — not promotional, but substantive answers that establish topical authority.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-accent acc-5"></div>
+      <div class="plan-step-num">05</div>
+      <div class="plan-content">
+        <div class="plan-header">
+          <div>
+            <div class="type-badge type-big">🎯 Big Picture</div>
+            <div class="plan-title">Build an Educational Content Library Targeting Category and Problem Queries</div>
+          </div>
+          <span class="impact-badge impact-high">High Impact</span>
+        </div>
+        <div class="plan-finding">Finding: Zero visibility across all 4 category queries and all 3 problem/solution queries tested — 7 of 12 total. The blog exists with 2–3 posts but none directly target the query language clients use when researching consulting services. LLMs can't recommend a firm they've never "read" answering the specific question being asked.</div>
+        <ul class="plan-actions">
+          <li>Write 4–6 long-form articles (1,000+ words) using the exact question format as H1: "When should I hire a strategy consultant?", "How to choose the right consulting firm for your business", "What does a business consultant actually do — and what does it cost?" These map directly to the High Priority queries in the table above.</li>
+          <li>Build a dedicated FAQ page at /faq with 15–20 Q&amp;As mirroring how people ask AI tools about consulting services. Add FAQPage schema to this page. This becomes a standing LLM citation source that compounds over time.</li>
+          <li>Establish a consistent publishing cadence of 2 articles per month. Topical authority builds from volume and consistency — a single article won't move the needle, but 12 targeted articles over 6 months will measurably improve category query visibility.</li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- SECTION 7: METHODOLOGY -->
+  <section>
+    <div class="section-label">Methodology</div>
+    <div class="methodology">
+      <p>GEO scores in this report are <strong>inferred from web presence signals</strong> — not live API queries to each LLM platform. This is intentional: the signals that predict LLM visibility (entity consistency, content authority, citation volume, structured data, and review presence) are the same signals you can directly control and improve. A live query shows a snapshot; this methodology shows you why you rank where you do and what to fix.</p>
+      <p>Overall scoring uses a weighted composite of 6 dimensions: Entity Clarity (20pts), Content Signals (20pts), Citation Presence (20pts), Schema &amp; Technical Structure (15pts), Brand Authority (15pts), and Topical Coverage (10pts). Per-platform scores are adjusted from the baseline using each LLM's known signal weighting tendencies — not live query results.</p>
+      <p>Competitor scores are estimated using the same methodology applied to publicly available signals. These are directional benchmarks, not exact measurements. Report prepared by <strong style="color:#3a8fd4;">IndexForge LLM</strong>.</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  GEO Report &nbsp;|&nbsp; Acme Consulting Group &nbsp;|&nbsp; March 18, 2026 &nbsp;|&nbsp; Prepared by <span class="accent">IndexForge LLM</span> &nbsp;|&nbsp; hello@indexforgellm.com
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.score-bar-fill').forEach(bar => {
+      const w = bar.getAttribute('data-width');
+      setTimeout(() => { bar.style.width = w + '%'; }, 300);
+    });
+  });
+
+  function downloadPDF() {
+    const btn = document.querySelector('.pdf-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Generating…';
+    btn.disabled = true;
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: 'AcmeConsultingGroup-GEO-Report-2026-03-18.pdf',
+      image: { type: 'jpeg', quality: 0.97 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#020617' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+    html2pdf().set(opt).from(document.body).save().then(() => {
+      btn.innerHTML = orig; btn.disabled = false;
+    }).catch(() => {
+      btn.innerHTML = orig; btn.disabled = false;
+    });
+  }
+
+  const gridColor  = 'rgba(30,41,59,0.8)';
+  const tickColor  = '#475569';
+  const labelColor = '#94a3b8';
+
+  // Radar — single company polygon, values normalized to 0–100
+  // Entity 16/20=80, Content 14/20=70, Citation 11/20=55, Schema 10/15=67, Authority 8/15=53, Topical 7/10=70
+  new Chart(document.getElementById('radarChart').getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: ['Entity Clarity', 'Content Signals', 'Citation Presence', 'Schema & Tech', 'Brand Authority', 'Topical Depth'],
+      datasets: [{
+        label: 'Acme Consulting Group',
+        data: [80, 70, 55, 67, 53, 70],
+        borderColor: '#3a8fd4',
+        backgroundColor: 'rgba(58,143,212,0.12)',
+        borderWidth: 2,
+        pointBackgroundColor: '#3a8fd4',
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 9 }, color: tickColor, backdropColor: 'transparent' },
+          pointLabels: { font: { size: 10, weight: '600' }, color: labelColor },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.r}` } }
+      }
+    }
+  });
+
+  // Competitor bar — company first (#3a8fd4), competitors (#334155)
+  new Chart(document.getElementById('competitorChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Acme Consulting Group', 'McKinsey Partners', 'Bain Local Office', 'Deloitte SMB', 'Regional Advisors Co.'],
+      datasets: [{
+        label: 'AI Visibility Score',
+        data: [72, 86, 81, 78, 64],
+        backgroundColor: ['#3a8fd4', '#334155', '#334155', '#334155', '#334155'],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      scales: {
+        x: { min: 0, max: 100, ticks: { font: { size: 10 }, color: tickColor }, grid: { color: gridColor } },
+        y: { ticks: { font: { size: 11 }, color: labelColor }, grid: { display: false } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` GEO Score: ${ctx.parsed.x} / 100` } }
+      }
+    }
+  });
+
+  // Donut — [positive, neutral, negative, not-mentioned]
+  new Chart(document.getElementById('donutChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Positive', 'Neutral', 'Negative', 'Not Mentioned'],
+      datasets: [{
+        data: [4, 1, 0, 7],
+        backgroundColor: ['#22c55e', '#94a3b8', '#ef4444', '#1e293b'],
+        borderWidth: 2,
+        borderColor: '#020617',
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} queries` } }
+      }
+    }
+  });
+</script>
+</body>
+</html>

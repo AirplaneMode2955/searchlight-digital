@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GEO Report Generator — IndexForge LLM</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #020617;
+    color: #e2e8f0;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(58,143,212,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #3a8fd4; animation: blink 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  .header-text { line-height: 1.2; }
+  .header-brand { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3a8fd4; }
+  .header-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+
+  /* ── Form ── */
+  .form-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .field-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #64748b; margin-bottom: 8px;
+    display: block;
+  }
+  .input-row { display: flex; gap: 10px; }
+  .url-input {
+    flex: 1;
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #e2e8f0;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .url-input:focus { border-color: rgba(58,143,212,0.5); }
+  .url-input::placeholder { color: #334155; }
+  .url-input:disabled { opacity: 0.5; cursor: not-allowed; }
+  .generate-btn {
+    padding: 12px 24px;
+    background: #3a8fd4;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .generate-btn:hover:not(:disabled) { background: #4fa8f0; }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Progress ── */
+  .progress-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .progress-card.visible { display: block; }
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .status-msg { font-size: 13px; color: #94a3b8; }
+  .char-count { font-size: 12px; color: #475569; font-variant-numeric: tabular-nums; }
+  .progress-track {
+    height: 4px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1e5fa0, #3a8fd4, #4fa8f0);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease-out;
+  }
+
+  /* ── Error ── */
+  .error-card {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    color: #f87171;
+    font-size: 13px;
+    display: none;
+  }
+  .error-card.visible { display: block; }
+
+  /* ── Report ready bar ── */
+  .ready-bar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .ready-bar.visible { display: flex; }
+  .ready-label { font-size: 13px; color: #4ade80; font-weight: 600; flex: 1; }
+  .action-btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, opacity 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { background: #3a8fd4; color: #fff; }
+  .btn-primary:hover { background: #4fa8f0; }
+  .btn-secondary {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #1e293b;
+  }
+  .btn-secondary:hover { border-color: #3a8fd4; color: #e2e8f0; }
+
+  /* ── Preview iframe ── */
+  .preview-wrap {
+    display: none;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .preview-wrap.visible { display: block; }
+  .preview-label {
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    padding: 10px 18px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #334155;
+  }
+  #preview-frame {
+    width: 100%;
+    height: 820px;
+    border: none;
+    display: block;
+    background: #020617;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="pulse"></div>
+    <div class="header-text">
+      <div class="header-brand">IndexForge LLM · Internal Tool</div>
+      <div class="header-title">GEO Report Generator</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <label class="field-label" for="url-input">Website URL</label>
+    <div class="input-row">
+      <input
+        id="url-input"
+        class="url-input"
+        type="url"
+        placeholder="https://example.com"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="gen-btn" class="generate-btn" onclick="generate()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-label">Generate Report</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-card" id="progress-card">
+    <div class="progress-top">
+      <div class="status-msg" id="status-msg">Starting…</div>
+      <div class="char-count" id="char-count"></div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-card" id="error-card"></div>
+
+  <!-- Ready bar -->
+  <div class="ready-bar" id="ready-bar">
+    <span class="ready-label">Report ready</span>
+    <button class="action-btn btn-secondary" onclick="copyHTML()">Copy HTML</button>
+    <button class="action-btn btn-secondary" onclick="downloadHTML()">Download HTML</button>
+    <button class="action-btn btn-primary" onclick="openTab()">Open in New Tab</button>
+  </div>
+
+  <!-- Preview iframe -->
+  <div class="preview-wrap" id="preview-wrap">
+    <div class="preview-label">Report Preview</div>
+    <iframe id="preview-frame" title="GEO Report Preview"></iframe>
+  </div>
+
+</div>
+
+<script>
+  let generatedHTML = ''
+  let blobUrl = ''
+  const CHAR_TARGET = 15000  // approximate output size for progress bar
+
+  function generate() {
+    const url = document.getElementById('url-input').value.trim()
+    if (!url) {
+      document.getElementById('url-input').focus()
+      return
+    }
+
+    // Reset UI
+    generatedHTML = ''
+    blobUrl = ''
+    setReady(false)
+    setError(null)
+    setProgress(true, 'Initializing…', 0)
+    setGenerating(true)
+
+    const source = new EventSource(`/generate?url=${encodeURIComponent(url)}`)
+
+    source.onmessage = (e) => {
+      let data
+      try { data = JSON.parse(e.data) } catch { return }
+
+      if (data.type === 'status') {
+        document.getElementById('status-msg').textContent = data.msg
+
+      } else if (data.type === 'chunk') {
+        generatedHTML += data.text
+        const pct = Math.min(98, Math.round(generatedHTML.length / CHAR_TARGET * 100))
+        document.getElementById('progress-fill').style.width = pct + '%'
+        document.getElementById('char-count').textContent =
+          generatedHTML.length.toLocaleString() + ' chars'
+
+      } else if (data.type === 'done') {
+        source.close()
+        finalize()
+
+      } else if (data.type === 'error') {
+        source.close()
+        setError(data.msg || 'An error occurred. Check your API key and try again.')
+        setProgress(false)
+        setGenerating(false)
+      }
+    }
+
+    source.onerror = () => {
+      source.close()
+      setError('Connection lost. Check that the server is running and try again.')
+      setProgress(false)
+      setGenerating(false)
+    }
+  }
+
+  function finalize() {
+    // Extract HTML from code fence if present
+    const extracted = extractHTML(generatedHTML)
+
+    // Inject report filename with today's date
+    const today = new Date().toISOString().slice(0, 10)
+    let html = extracted.replace(
+      /filename:\s*'[^']+'/,
+      `filename: '${slugify(document.getElementById('url-input').value)}-GEO-Report-${today}.pdf'`
+    )
+
+    // Create blob URL for iframe
+    const blob = new Blob([html], { type: 'text/html' })
+    if (blobUrl) URL.revokeObjectURL(blobUrl)
+    blobUrl = URL.createObjectURL(blob)
+    generatedHTML = html
+
+    document.getElementById('preview-frame').src = blobUrl
+    document.getElementById('progress-fill').style.width = '100%'
+    document.getElementById('status-msg').textContent = 'Complete'
+
+    setReady(true)
+    setProgress(true)
+    setGenerating(false)
+    document.getElementById('preview-wrap').classList.add('visible')
+
+    // Scroll to preview
+    setTimeout(() => {
+      document.getElementById('ready-bar').scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 200)
+  }
+
+  function extractHTML(text) {
+    const match = text.match(/```html\s*\n([\s\S]*?)```\s*$/)
+    if (match) return match[1].trim()
+    // If no fence, return as-is (Claude may have output raw HTML)
+    const doctype = text.indexOf('<!DOCTYPE html>')
+    if (doctype !== -1) return text.slice(doctype)
+    return text
+  }
+
+  function slugify(url) {
+    return url.replace(/https?:\/\/(www\.)?/, '').replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+  }
+
+  function downloadHTML() {
+    if (!generatedHTML) return
+    const a = document.createElement('a')
+    const today = new Date().toISOString().slice(0, 10)
+    a.download = `${slugify(document.getElementById('url-input').value)}-GEO-Report-${today}.html`
+    a.href = URL.createObjectURL(new Blob([generatedHTML], { type: 'text/html' }))
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000)
+  }
+
+  function openTab() {
+    if (blobUrl) window.open(blobUrl, '_blank')
+  }
+
+  function copyHTML() {
+    if (!generatedHTML) return
+    navigator.clipboard.writeText(generatedHTML).then(() => {
+      const btn = document.querySelector('.action-btn.btn-secondary')
+      const orig = btn.textContent
+      btn.textContent = 'Copied!'
+      setTimeout(() => btn.textContent = orig, 1500)
+    })
+  }
+
+  function setGenerating(on) {
+    const btn = document.getElementById('gen-btn')
+    const spinner = document.getElementById('spinner')
+    const label = document.getElementById('btn-label')
+    const input = document.getElementById('url-input')
+    btn.disabled = on
+    input.disabled = on
+    spinner.classList.toggle('visible', on)
+    label.textContent = on ? 'Generating…' : 'Generate Report'
+  }
+
+  function setProgress(show, msg, pct) {
+    const card = document.getElementById('progress-card')
+    card.classList.toggle('visible', show)
+    if (msg !== undefined) document.getElementById('status-msg').textContent = msg
+    if (pct !== undefined) document.getElementById('progress-fill').style.width = pct + '%'
+  }
+
+  function setReady(show) {
+    document.getElementById('ready-bar').classList.toggle('visible', show)
+  }
+
+  function setError(msg) {
+    const card = document.getElementById('error-card')
+    if (msg) {
+      card.textContent = '⚠ ' + msg
+      card.classList.add('visible')
+    } else {
+      card.classList.remove('visible')
+    }
+  }
+
+  // Submit on Enter
+  document.getElementById('url-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') generate()
+  })
+</script>
+</body>
+</html>
