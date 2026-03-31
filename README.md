@@ -18,28 +18,6 @@ npm install
 npm run dev
 ```
 
-### 2. GEO Report Generator (`tools/geo-generator/`)
-
-An internal Express + Claude API server that takes a company URL, scrapes up to 5 pages, and generates a self-contained dark-mode HTML GEO report. The report scores the site across 6 GEO dimensions, produces per-LLM scores (ChatGPT, Claude, Perplexity, Gemini, Grok), includes Chart.js visualizations, and outputs a 5-step improvement plan.
-
-**Run locally:**
-```bash
-npm run geo
-# Server starts on http://localhost:3001
-```
-
-### 3. GEO Analyzer System Prompt (`docs/prompts/`)
-
-A Claude Project system prompt (3-layer architecture) used to manually run GEO audits inside claude.ai. This is the primary audit workflow — paste the system prompt into a Claude Project, then send a URL to get a full HTML report back.
-
-| File | Purpose |
-|---|---|
-| `deep-geo-analyzer-system-prompt.md` | Complete system prompt — ready to paste into a Claude Project |
-| `geo-report-template.html` | The HTML output template with all 84 data placeholders |
-| `geo-report-demo.html` | Filled-in demo report (Acme Consulting Group sample data) |
-
----
-
 ## Tech Stack
 
 | Layer | Stack |
