@@ -799,3 +799,60 @@ function WhySearchLight() {
     </section>
   )
 }
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
+
+function Pricing() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="pricing" data-dark-section className="py-24" style={{ backgroundColor: DARK_BG }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Pricing</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-5">Simple, transparent pricing.</h2>
+          <p className="text-slate-400 text-lg leading-relaxed">Two clear options. No retainers, no packages, no hidden fees.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-4xl mx-auto mb-8">
+          <div className="rounded-xl p-8 flex flex-col fade-in-on-scroll" style={{ border: `1px solid ${DARK_BORDER}`, backgroundColor: DARK_SURFACE }}>
+            <div className="mb-8">
+              <p className="text-slate-500 text-xs font-medium uppercase tracking-widest mb-2">Get started</p>
+              <h3 className="text-white font-bold text-2xl mb-4">Free SEO Analysis</h3>
+              <div className="flex items-baseline gap-1"><span className="text-4xl font-bold text-white">Free</span></div>
+            </div>
+            <ul className="space-y-3 mb-8 flex-1">
+              {['Search visibility review','High-level strengths and weaknesses','Top missed opportunities','Simple recommendations'].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-sm text-slate-400"><CheckIcon className="w-4 h-4 flex-shrink-0" style={{ color: DARK_BORDER }} />{item}</li>
+              ))}
+            </ul>
+            <a href="mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-md text-slate-300 hover:text-white font-medium text-sm transition-all duration-200" style={{ border: `1px solid ${DARK_BORDER}` }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = ORANGE)}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+            >Request Free Analysis</a>
+          </div>
+          <div className="rounded-xl p-8 flex flex-col relative overflow-hidden fade-in-on-scroll" style={{ border: '1px solid rgba(249,115,22,0.4)', background: `linear-gradient(160deg, rgba(249,115,22,0.12) 0%, ${DARK_SURFACE} 55%)`, transitionDelay: '60ms' }}>
+            <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none" style={{ backgroundColor: 'rgba(249,115,22,0.07)' }} />
+            <div className="mb-8">
+              <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: ORANGE }}>Recommended</p>
+              <h3 className="text-white font-bold text-2xl mb-4">GEO Report</h3>
+              <div className="flex items-baseline gap-1">
+                <span className="text-slate-500 text-xl">$</span>
+                <span className="text-4xl font-bold text-white">500</span>
+                <span className="text-slate-500 text-sm ml-1">one-time</span>
+              </div>
+            </div>
+            <ul className="space-y-3 mb-8 flex-1">
+              {['AI visibility review','Brand discoverability analysis','Competitor comparison overview','Structured findings','5 custom next steps'].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-sm text-slate-300"><CheckIcon className="w-4 h-4 flex-shrink-0" style={{ color: ORANGE }} />{item}</li>
+              ))}
+            </ul>
+            <a href="mailto:searchlightdigitalai@gmail.com?subject=GEO Report Request" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-md text-white font-medium text-sm transition-colors duration-200" style={{ backgroundColor: ORANGE }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}
+            >Request GEO Report</a>
+          </div>
+        </div>
+        <p className="text-center text-slate-500 text-sm max-w-lg mx-auto">The GEO Report is a focused, high-value diagnostic for businesses that want to understand and improve how they appear in AI-driven search.</p>
+      </div>
+    </section>
+  )
+}
