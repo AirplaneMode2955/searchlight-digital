@@ -538,3 +538,55 @@ function SEOvsGEO() {
     </section>
   )
 }
+
+// ─── Services ─────────────────────────────────────────────────────────────────
+
+function Services() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="services" className="bg-white py-24 border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-2xl mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Services</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-5">Two focused offerings.</h2>
+          <p className="text-slate-500 text-lg leading-relaxed">Everything SearchLight Digital offers is built around giving you a clear picture of your visibility and concrete steps to improve it.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="rounded-xl border border-slate-200 p-8 flex flex-col fade-in-on-scroll">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">No cost</p>
+                <h3 className="text-slate-900 font-bold text-2xl">SEO Analysis</h3>
+              </div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-sm font-semibold">Free</span>
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-6">A no-cost, high-level review of your current search visibility. You'll get a clear read on your strengths, your weaknesses, and where you may be missing opportunities — with simple, direct recommendations.</p>
+            <ul className="space-y-2.5 mb-8 flex-1">
+              {['Search visibility review','High-level strengths and weaknesses','Top missed opportunities','Simple recommendations'].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-sm text-slate-600"><CheckIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />{item}</li>
+              ))}
+            </ul>
+            <a href="mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-md border border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 font-medium text-sm transition-all duration-200">Request Free Analysis</a>
+          </div>
+          <div className="rounded-xl p-8 flex flex-col relative overflow-hidden fade-in-on-scroll" style={{ border: '1px solid rgba(249,115,22,0.35)', background: 'linear-gradient(160deg, rgba(249,115,22,0.06) 0%, white 60%)', transitionDelay: '60ms' }}>
+            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none" style={{ backgroundColor: 'rgba(249,115,22,0.06)' }} />
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: ORANGE }}>Paid Report</p>
+                <h3 className="text-slate-900 font-bold text-2xl">GEO Report</h3>
+              </div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold" style={{ backgroundColor: 'rgba(249,115,22,0.12)', color: '#ea6c00' }}>$500</span>
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-6">A focused, technical diagnostic for businesses that want to understand and improve how they show up in AI-driven search. Structured findings, competitive context, and a clear path forward — delivered as a premium, standalone report.</p>
+            <ul className="space-y-2.5 mb-8 flex-1">
+              {['AI visibility review','Brand discoverability analysis','Competitor comparison overview','Structured findings','5 custom next steps'].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-sm text-slate-600"><CheckIcon className="w-4 h-4 flex-shrink-0" style={{ color: ORANGE }} />{item}</li>
+              ))}
+            </ul>
+            <a href="mailto:searchlightdigitalai@gmail.com?subject=GEO Report Request" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-md text-white font-medium text-sm transition-colors duration-200" style={{ backgroundColor: ORANGE }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)} onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}>Request GEO Report</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
