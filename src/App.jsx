@@ -590,3 +590,57 @@ function Services() {
     </section>
   )
 }
+
+// ─── Full Service ─────────────────────────────────────────────────────────────
+
+function FullService() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="full-service" data-dark-section className="py-24" style={{ backgroundColor: DARK_BG }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Full Service</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-5">We Don't Just Tell You What to Fix — We Fix It.</h2>
+          <p className="text-slate-400 text-lg leading-relaxed">For businesses that want more than a report, SearchLight Digital offers hands-on implementation and ongoing monitoring of your online presence.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+          <div className="rounded-xl p-8 fade-in-on-scroll" style={{ backgroundColor: DARK_SURFACE, border: `1px solid ${DARK_BORDER}` }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+          >
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-5" style={{ backgroundColor: 'rgba(249,115,22,0.10)', color: ORANGE }}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            <h3 className="text-white font-semibold text-xl mb-3">Implementation</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">We take the findings from your report and make the changes needed — technical fixes, content improvements, schema markup, entity signals, and more. You get the expertise without needing to manage it yourself.</p>
+          </div>
+          <div className="rounded-xl p-8 fade-in-on-scroll" style={{ backgroundColor: DARK_SURFACE, border: `1px solid ${DARK_BORDER}`, transitionDelay: '60ms' }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(249,115,22,0.4)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+          >
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-5" style={{ backgroundColor: 'rgba(249,115,22,0.10)', color: ORANGE }}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="text-white font-semibold text-xl mb-3">Monitoring</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">We keep a continuous eye on your search and AI visibility, tracking changes and adjusting strategy as the landscape evolves. Stay ahead of algorithm shifts and changes in how AI tools represent your industry.</p>
+          </div>
+        </div>
+        <div className="text-center">
+          <a href="mailto:searchlightdigitalai@gmail.com?subject=Full Service Inquiry" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-md text-white font-medium transition-colors duration-200" style={{ backgroundColor: ORANGE }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}
+          >
+            Contact for Pricing
+            <ArrowRightIcon className="w-4 h-4" />
+          </a>
+          <p className="text-slate-600 text-sm mt-3">Custom pricing based on scope and ongoing needs.</p>
+        </div>
+      </div>
+    </section>
+  )
+}
