@@ -644,3 +644,39 @@ function FullService() {
     </section>
   )
 }
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+
+const processSteps = [
+  { number: '01', title: 'Submit company details', body: 'Share basic information about your business — your website, industry, and any context that helps us understand your goals and competitive environment.' },
+  { number: '02', title: 'We analyze your visibility', body: 'Using structured, expert review, we examine how your business appears across traditional search and AI-generated answer environments — including gaps and competitor positioning.' },
+  { number: '03', title: 'We identify weak points and opportunities', body: "We work through the findings systematically: where you're underrepresented, where competitors have an edge, and where the clearest opportunities to improve exist." },
+  { number: '04', title: 'You receive your report', body: 'You receive a structured report with findings across every area analyzed — plus 5 custom next steps tailored to your business and specific visibility gaps.' },
+]
+
+function HowItWorks() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="how-it-works" data-dark-section className="py-24" style={{ backgroundColor: DARK_SURFACE }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>How It Works</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-5">A straightforward process.</h2>
+          <p className="text-slate-400 text-lg leading-relaxed">From submission to delivery, the process is designed to be clear and low-friction on your end.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {processSteps.map((step, i) => (
+            <div key={step.number} className="rounded-xl p-6 transition-all duration-200 fade-in-on-scroll" style={{ backgroundColor: DARK_BG, border: `1px solid ${DARK_BORDER}`, transitionDelay: `${i * 60}ms` }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(249,115,22,0.35)')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+            >
+              <div className="font-mono text-xs font-bold mb-4" style={{ color: 'rgba(249,115,22,0.5)' }}>{step.number}</div>
+              <h3 className="text-white font-semibold text-base mb-3">{step.title}</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">{step.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
