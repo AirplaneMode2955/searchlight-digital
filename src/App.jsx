@@ -481,3 +481,60 @@ function WhatWeDo() {
     </section>
   )
 }
+
+// ─── SEO vs GEO ───────────────────────────────────────────────────────────────
+
+function SEOvsGEO() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="seo-vs-geo" className="bg-slate-50 py-24 border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>SEO vs GEO</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-5">Two kinds of visibility. Both matter.</h2>
+          <p className="text-slate-500 text-lg leading-relaxed">Search has evolved. Customers now find information through traditional search engines and through AI tools that synthesize and summarize answers on their behalf.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+          <div className="rounded-xl border border-slate-200 bg-white p-8 fade-in-on-scroll">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center">
+                <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+              </div>
+              <div>
+                <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">Traditional</p>
+                <h3 className="text-slate-900 font-bold text-xl">SEO</h3>
+              </div>
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-6">Search Engine Optimization is how your business appears in traditional search results — Google, Bing, and other search engines. It covers rankings, search presence, organic traffic, and how discoverable your site is to users actively searching for your products or services.</p>
+            <ul className="space-y-2.5">
+              {['Keyword rankings and search presence','Website structure and technical health','Content relevance and authority signals','Backlink profile and domain credibility','Search result visibility and click-through'].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-slate-600"><CheckIcon className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl bg-white p-8 relative overflow-hidden fade-in-on-scroll" style={{ border: '1px solid rgba(249,115,22,0.3)', transitionDelay: '60ms' }}>
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none" style={{ backgroundColor: 'rgba(249,115,22,0.05)' }} />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ backgroundColor: 'rgba(249,115,22,0.08)' }}>
+                <svg className="w-4 h-4" style={{ color: ORANGE }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-widest" style={{ color: ORANGE }}>Emerging</p>
+                <h3 className="text-slate-900 font-bold text-xl">GEO</h3>
+              </div>
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-6">Generative Engine Optimization is how your business appears in AI-generated responses. When someone asks an AI tool a question, it synthesizes an answer from what it knows — and how your business is represented in those environments is now as important as your search rankings.</p>
+            <ul className="space-y-2.5">
+              {['AI-generated answer presence and citations','How your brand is described and summarized','Entity clarity and brand signal strength','Representation accuracy in AI responses','Discoverability in generative search environments'].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-slate-600"><CheckIcon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: ORANGE }} />{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 px-8 py-6 text-center">
+          <p className="text-slate-600 text-base leading-relaxed max-w-3xl mx-auto">Businesses that only optimize for traditional search are leaving visibility on the table. As more people use AI tools to research, compare, and decide — your GEO presence directly affects whether your business gets mentioned, cited, or recommended at all.</p>
+        </div>
+      </div>
+    </section>
+  )
+}
