@@ -680,3 +680,122 @@ function HowItWorks() {
     </section>
   )
 }
+
+// ─── Five Next Steps ──────────────────────────────────────────────────────────
+
+const nextStepsItems = [
+  { label: 'Content clarity', desc: 'Improve how your content communicates who you are, what you do, and who you serve — so AI systems can accurately represent you.' },
+  { label: 'Brand and entity signals', desc: 'Strengthen the signals that help search engines and AI systems recognize and understand your business as a distinct, credible entity.' },
+  { label: 'Site structure and discoverability', desc: 'Address structural issues that limit how your pages are crawled, indexed, and understood — in both search and AI contexts.' },
+  { label: 'Visibility gap closure', desc: 'Target specific gaps where your business is absent or underrepresented in search results or AI-generated answers.' },
+  { label: 'AI representation improvement', desc: 'Take concrete steps to increase the likelihood that your business is accurately cited, surfaced, and represented in future AI-generated answers.' },
+]
+
+function FiveNextSteps() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="next-steps" className="bg-white py-24 border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="fade-in-on-scroll">
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Included in Every GEO Report</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-6">5 custom next steps — not a checklist.</h2>
+            <p className="text-slate-500 text-base leading-relaxed mb-4">Every GEO Report includes 5 custom next steps based on your current visibility gaps, content structure, brand signals, and discoverability opportunities.</p>
+            <p className="text-slate-500 text-base leading-relaxed mb-8">The report does not stop at observations. These next steps are built directly from the findings in your report — not pulled from a generic template.</p>
+            <div className="space-y-2">
+              {['Specific to your business','Strategic in scope','Tailored to your findings','Action-oriented','Built to move visibility forward'].map((tag) => (
+                <div key={tag} className="flex items-center gap-2.5 text-sm text-slate-600">
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: ORANGE }} />
+                  {tag}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div ref={fadeRef} className="space-y-3">
+            {nextStepsItems.map((item, i) => (
+              <div key={item.label} className="flex gap-4 p-5 rounded-xl border border-slate-200 bg-slate-50 transition-all duration-200 fade-in-on-scroll" style={{ transitionDelay: `${i * 50}ms` }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.3)'; e.currentTarget.style.backgroundColor = '#fff8f5' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.backgroundColor = '#f8fafc' }}
+              >
+                <div className="w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: ORANGE }}>{i + 1}</div>
+                <div>
+                  <p className="text-slate-900 font-semibold text-sm mb-1">{item.label}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Why It Matters ───────────────────────────────────────────────────────────
+
+const whyMattersPoints = [
+  { title: 'Search behavior has shifted', body: "Customers no longer rely solely on traditional search engines to find what they're looking for. They ask AI tools for recommendations, comparisons, summaries, and answers — and those tools respond with synthesized content, not a list of links." },
+  { title: "If you're not in the answer, you're not in the consideration set", body: "When an AI tool generates a response about your category or service area, it draws on what it knows about the players in that space. If your business is absent, unclear, or misrepresented, you lose visibility before the customer ever reaches your website." },
+  { title: 'Strong digital presence now means both', body: "Traditional search visibility remains important. But it's no longer sufficient on its own. Businesses that want to stay discoverable need to understand and actively manage both their search presence and their AI answer presence." },
+]
+
+function WhyItMatters() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="why-it-matters" className="bg-slate-50 py-24 border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Why It Matters</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-5">The way people find businesses has changed.</h2>
+          <p className="text-slate-500 text-lg leading-relaxed">Understanding your visibility in this environment is no longer optional — it's a core part of staying relevant and discoverable.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {whyMattersPoints.map((point, i) => (
+            <div key={point.title} className="bg-white rounded-xl border border-slate-200 p-7 hover:border-slate-300 transition-colors duration-200 fade-in-on-scroll" style={{ transitionDelay: `${i * 60}ms` }}>
+              <div className="w-1 h-8 rounded-full mb-5" style={{ backgroundColor: ORANGE }} />
+              <h3 className="text-slate-900 font-semibold text-base mb-3">{point.title}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{point.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Why SearchLight Digital ──────────────────────────────────────────────────
+
+const whyUsReasons = [
+  { title: 'Specialized, not generalist', body: "SearchLight Digital focuses exclusively on SEO and GEO analysis and implementation. This is not a full-service agency — it's a focused practice built around one specific problem: your online visibility." },
+  { title: 'Expert analysis, not guesswork', body: 'Visibility analysis is done through structured, methodical review — not high-level observation or generic checklists. The findings are grounded in actual data and expert examination.' },
+  { title: 'Clear, readable deliverables', body: "Reports are structured for clarity. You get a real understanding of what was found and why it matters — not a wall of jargon or an overwhelming document." },
+  { title: 'Practical output that moves forward', body: 'Every engagement ends with specific, actionable steps — not vague suggestions. The goal is always to give you something you can act on immediately.' },
+  { title: 'End-to-end capability', body: "From the initial report through implementation and ongoing monitoring, SearchLight Digital can handle the full lifecycle of your visibility improvement — no handoffs to other vendors." },
+  { title: 'Built for businesses that want clarity', body: "If you want to understand exactly where your business stands and what to do next — without the noise — SearchLight Digital is the right fit." },
+]
+
+function WhySearchLight() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="why-us" className="bg-white py-24 border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-2xl mb-14">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Why SearchLight Digital</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-5">Focused. Technical. Direct.</h2>
+          <p className="text-slate-500 text-lg leading-relaxed">SearchLight Digital is built for businesses that want a clear, honest look at their visibility — and a practical path to improving it.</p>
+        </div>
+        <div ref={fadeRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {whyUsReasons.map((reason, i) => (
+            <div key={reason.title} className="p-6 rounded-xl border border-slate-200 transition-all duration-200 fade-in-on-scroll" style={{ transitionDelay: `${i * 50}ms` }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(249,115,22,0.35)'; e.currentTarget.style.backgroundColor = '#fff8f5' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.backgroundColor = '' }}
+            >
+              <h3 className="text-slate-900 font-semibold text-base mb-2.5">{reason.title}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{reason.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
