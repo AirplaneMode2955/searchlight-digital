@@ -392,3 +392,33 @@ function Hero() {
     </section>
   )
 }
+
+// ─── Stats Strip ──────────────────────────────────────────────────────────────
+
+function StatCounter({ target, suffix = '', label }) {
+  const { value, ref } = useCounter(target)
+  return (
+    <div ref={ref} className="text-center">
+      <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
+        {value}{suffix}
+      </div>
+      <div className="text-slate-400 text-sm font-medium">{label}</div>
+    </div>
+  )
+}
+
+function StatsStrip() {
+  return (
+    <section
+      data-dark-section
+      className="py-16 border-t border-b"
+      style={{ backgroundColor: DARK_SURFACE, borderColor: DARK_BORDER }}
+    >
+      <div className="max-w-4xl mx-auto px-6 grid grid-cols-3 gap-8">
+        <StatCounter target={500} suffix="+" label="Businesses Analyzed" />
+        <StatCounter target={2} label="Visibility Dimensions" />
+        <StatCounter target={5} label="Custom Next Steps Per Report" />
+      </div>
+    </section>
+  )
+}
