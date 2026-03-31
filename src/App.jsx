@@ -856,3 +856,52 @@ function Pricing() {
     </section>
   )
 }
+
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+
+const faqData = [
+  { q: 'What is GEO?', a: "GEO stands for Generative Engine Optimization. It refers to how your business appears in AI-generated responses — when someone asks an AI tool a question and it synthesizes an answer. GEO is about ensuring your business is accurately represented, cited, and visible in those environments." },
+  { q: 'How is GEO different from SEO?', a: "SEO focuses on visibility in traditional search engines like Google — rankings, organic traffic, and search presence. GEO focuses on visibility in AI-generated answers — how you're described, cited, or omitted when AI tools respond to relevant queries. Both matter, and both require different analysis approaches." },
+  { q: 'Who is this for?', a: "SearchLight Digital works best for business owners and operators who want a clear, honest picture of their online visibility and practical guidance on what to do about it. You don't need a large marketing team or a technical background to benefit from the analysis." },
+  { q: 'What do I receive in the GEO Report?', a: "You receive a structured report that includes: a current AI and search visibility snapshot, a brand presence and discoverability review, a competitor comparison overview, content and entity clarity observations, risk and opportunity highlights, and 5 custom next steps tailored to your business." },
+  { q: 'What are the 5 custom next steps?', a: "These are specific, strategic recommendations built directly from the findings in your report. They're tailored to your business's visibility gaps, content structure, brand signals, and discoverability opportunities — not pulled from a generic template." },
+  { q: 'How long does the report take?', a: "Turnaround time is typically 5–7 business days from the time you submit your company details. If your timeline is more urgent, reach out and we'll discuss options." },
+  { q: 'Do you offer ongoing support after the report?', a: "The GEO Report is a standalone deliverable — a diagnostic, not a retainer. If you want to discuss the findings or explore next steps in more detail, that's available after delivery. For ongoing work, see our Full Service offering." },
+  { q: 'Do you offer implementation services?', a: "Yes. Beyond reports, SearchLight Digital offers hands-on implementation — we make the changes identified in your analysis ourselves. This includes technical fixes, content improvements, schema markup, entity signals, and more. Contact us for pricing." },
+  { q: 'What does monitoring include?', a: "Our monitoring service tracks your search and AI visibility on an ongoing basis, watching for changes in how your business is represented, shifts in competitor positioning, and algorithm or AI model updates that affect your discoverability. We adjust strategy as the landscape evolves." },
+]
+
+function FAQItem({ q, a }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border-b border-slate-200 last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-start justify-between gap-4 py-5 text-left group">
+        <span className="text-slate-900 font-medium text-base transition-colors duration-200" style={open ? { color: ORANGE } : {}}>{q}</span>
+        <ChevronDownIcon className={`w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <div className="overflow-hidden transition-all duration-300 ease-in-out" style={{ maxHeight: open ? '400px' : '0px' }}>
+        <div className="pb-5 pr-8">
+          <p className="text-slate-500 text-sm leading-relaxed">{a}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FAQ() {
+  return (
+    <section id="faq" className="bg-slate-50 py-24 border-b border-slate-100">
+      <div className="max-w-3xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>FAQ</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Common questions.</h2>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 px-6 md:px-8">
+          {faqData.map((item) => (
+            <FAQItem key={item.q} q={item.q} a={item.a} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
