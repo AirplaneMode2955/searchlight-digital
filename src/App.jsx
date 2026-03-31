@@ -244,3 +244,151 @@ function Nav() {
     </nav>
   )
 }
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+function Hero() {
+  const fadeRef = useFadeIn()
+
+  return (
+    <section
+      id="hero"
+      data-dark-section
+      className="relative min-h-screen flex items-center overflow-hidden"
+      style={{ backgroundColor: DARK_BG }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgba(249,115,22,0.10) 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse 80% 60% at 50% 40%, transparent 40%, ${DARK_BG} 100%)`,
+        }}
+      />
+      <div
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(249,115,22,0.07)' }}
+      />
+
+      <div ref={fadeRef} className="relative max-w-6xl mx-auto px-6 py-32 w-full flex flex-col lg:flex-row items-center gap-16">
+        <div className="flex-1 max-w-xl fade-in-on-scroll">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-8"
+            style={{
+              border: `1px solid rgba(249,115,22,0.3)`,
+              background: 'rgba(249,115,22,0.08)',
+            }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: ORANGE }} />
+            <span className="text-slate-400 text-xs font-medium tracking-widest uppercase">
+              Search and AI Visibility Agency
+            </span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-bold text-white leading-[1.1] tracking-tight mb-4">
+            Illuminate Your Visibility. Dominate Your Reach.
+          </h1>
+
+          <p className="text-lg font-semibold mb-5" style={{ color: ORANGE }}>
+            See how your business shows up in search and AI — and what to do about it.
+          </p>
+
+          <p className="text-slate-400 text-base leading-relaxed mb-5">
+            SearchLight Digital helps businesses understand how they appear in traditional search
+            engines and AI-generated answers — through expert analysis, structured reporting,
+            and hands-on implementation.
+          </p>
+
+          <p className="text-slate-600 text-sm font-medium mb-10 border-l-2 pl-4" style={{ borderColor: DARK_BORDER }}>
+            We surface real visibility opportunities — then help you act on them.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href={`mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request`}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-md text-white font-medium text-sm transition-colors duration-200"
+              style={{ backgroundColor: ORANGE }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}
+            >
+              Get Free SEO Analysis
+              <ArrowRightIcon className="w-4 h-4" />
+            </a>
+            <a
+              href="#services"
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-md border text-slate-300 hover:text-white font-medium text-sm transition-colors duration-200"
+              style={{ borderColor: DARK_BORDER }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = '#64748b')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+            >
+              See GEO Report — $500
+            </a>
+          </div>
+        </div>
+
+        <div className="flex-1 w-full max-w-md lg:max-w-none lg:flex-none lg:w-[440px] fade-in-on-scroll" style={{ transitionDelay: '100ms' }}>
+          <div
+            className="rounded-xl overflow-hidden shadow-2xl shadow-black/40"
+            style={{ border: `1px solid ${DARK_BORDER}`, backgroundColor: DARK_SURFACE }}
+          >
+            <div
+              className="flex items-center gap-1.5 px-4 py-3"
+              style={{ borderBottom: `1px solid ${DARK_BORDER}`, backgroundColor: DARK_BG }}
+            >
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: DARK_BORDER }} />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: DARK_BORDER }} />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: DARK_BORDER }} />
+              <span className="ml-3 text-slate-500 text-xs font-mono tracking-wide">
+                searchlight — visibility-analysis
+              </span>
+            </div>
+
+            <div className="p-6 font-mono text-sm space-y-4">
+              <div className="text-slate-600 text-xs">// Visibility analysis — sample output</div>
+
+              <div className="space-y-2.5">
+                {[
+                  { key: 'domain_authority', value: 'reviewed' },
+                  { key: 'keyword_visibility', value: 'analyzed' },
+                  { key: 'ai_citation_presence', value: 'measured' },
+                  { key: 'brand_entity_clarity', value: 'evaluated' },
+                  { key: 'competitor_comparison', value: 'complete' },
+                ].map((row) => (
+                  <div key={row.key} className="flex items-center gap-3">
+                    <span className="text-base leading-none" style={{ color: ORANGE }}>✓</span>
+                    <span className="text-slate-300">{row.key}</span>
+                    <span className="text-slate-700 mx-1">—</span>
+                    <span className="text-slate-500">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 mt-4 space-y-3" style={{ borderTop: `1px solid ${DARK_BORDER}` }}>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-500">next_steps generated</span>
+                  <span className="font-semibold font-mono" style={{ color: ORANGE }}>5 / 5</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: DARK_BORDER }}>
+                  <div
+                    className="h-full w-full rounded-full"
+                    style={{ background: `linear-gradient(to right, #c2410c, ${ORANGE})` }}
+                  />
+                </div>
+                <div className="text-slate-600 text-xs pt-1">Report ready for delivery.</div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-slate-700 text-xs text-center mt-4 font-mono">
+            Illustrative output — real reports contain structured findings
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
