@@ -905,3 +905,93 @@ function FAQ() {
     </section>
   )
 }
+
+// ─── Final CTA ────────────────────────────────────────────────────────────────
+
+function FinalCTA() {
+  const fadeRef = useFadeIn()
+  return (
+    <section id="cta" data-dark-section className="py-28 relative overflow-hidden" style={{ backgroundColor: DARK_BG }}>
+      <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle, rgba(249,115,22,0.09) 1px, transparent 1px)`, backgroundSize: '28px 28px' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(249,115,22,0.07)' }} />
+      <div ref={fadeRef} className="relative max-w-3xl mx-auto px-6 text-center">
+        <div className="flex justify-center mb-8 fade-in-on-scroll">
+          <img src="/searchlight-logo.png" alt="SearchLight Digital" className="h-24 w-auto" />
+        </div>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4 fade-in-on-scroll" style={{ transitionDelay: '60ms' }}>Illuminate Your Visibility.</h2>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 fade-in-on-scroll" style={{ color: ORANGE, transitionDelay: '100ms' }}>Dominate Your Reach.</h2>
+        <p className="text-slate-400 text-lg leading-relaxed mb-10 max-w-xl mx-auto fade-in-on-scroll" style={{ transitionDelay: '140ms' }}>Get clarity on how your business shows up in search and AI — and a clear path forward.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 fade-in-on-scroll" style={{ transitionDelay: '180ms' }}>
+          <a href="mailto:searchlightdigitalai@gmail.com?subject=Free SEO Analysis Request" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-md text-white font-medium transition-colors duration-200 w-full sm:w-auto" style={{ backgroundColor: ORANGE }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = ORANGE_HOVER)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = ORANGE)}
+          >
+            Get Free SEO Analysis
+            <ArrowRightIcon className="w-4 h-4" />
+          </a>
+          <a href="mailto:searchlightdigitalai@gmail.com?subject=GEO Report Request" className="inline-flex items-center justify-center px-7 py-3.5 rounded-md text-slate-300 hover:text-white font-medium transition-all duration-200 w-full sm:w-auto" style={{ border: `1px solid ${DARK_BORDER}` }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = ORANGE)}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+          >
+            Request GEO Report — $500
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+function Footer() {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="border-t py-12" style={{ backgroundColor: DARK_BG, borderColor: DARK_BORDER }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
+          <div>
+            <img src="/searchlight-logo.png" alt="SearchLight Digital" className="h-14 w-auto mb-2" />
+            <p className="text-slate-500 text-sm">Illuminate Your Visibility. Dominate Your Reach.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {navLinks.map((link) => (
+                <a key={link.href} href={link.href} className="text-slate-500 hover:text-slate-300 text-sm transition-colors duration-200">{link.label}</a>
+              ))}
+            </div>
+            <a href="mailto:searchlightdigitalai@gmail.com" className="text-slate-400 hover:text-white text-sm transition-colors duration-200">searchlightdigitalai@gmail.com</a>
+          </div>
+        </div>
+        <div className="pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderColor: DARK_BORDER }}>
+          <p className="text-slate-600 text-xs">© {year} SearchLight Digital. All rights reserved.</p>
+          <p className="text-slate-700 text-xs">SEO & GEO Visibility Agency</p>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  return (
+    <>
+      <SpotlightCursor />
+      <Nav />
+      <Hero />
+      <StatsStrip />
+      <WhatWeDo />
+      <SEOvsGEO />
+      <Services />
+      <FullService />
+      <HowItWorks />
+      <FiveNextSteps />
+      <WhyItMatters />
+      <WhySearchLight />
+      <Pricing />
+      <FAQ />
+      <FinalCTA />
+      <Footer />
+    </>
+  )
+}
